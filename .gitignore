@@ -1,0 +1,10 @@
+# OS stuff
+/.idea
+.DS_Store
+
+# Node stuff
+node_modules
+dist
+
+# So wow such security
+ssh

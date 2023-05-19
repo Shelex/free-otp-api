@@ -1,0 +1,13 @@
+[Unit]
+Description=free-otp-code
+After=network.target
+
+[Service]
+Environment=NODE_PORT=3030
+Type=simple
+User=otp
+ExecStart=/usr/bin/node /var/www/otp.shelex.dev/html/dist/app.js
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
