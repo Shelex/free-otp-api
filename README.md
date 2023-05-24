@@ -13,7 +13,7 @@ Just one simple stupid endpoint to get specific sms for specific phone number to
 - has browser instance running on demand
 - each request will spawn a page in the browser, up to 10 pages.
 - every 10 minutes browser is closed to avoid memory issues with long-living browser.
-- recursively searches phone number page for latest sms by `match` substring or `ago` query parameter, refreshing page every 5 sec
+- recursively searches phone number page for latest sms by `match` substring or `ago` query parameter, refreshing page every 3 sec
 - returns sms that matches provided inputs, you have just to parse OTP code from it :)
 
 ## Examples
@@ -66,8 +66,8 @@ Just one simple stupid endpoint to get specific sms for specific phone number to
 - `puppeteer-extra` + plugins is used to bypass cloudflare protection
 - `fastify` as web framework
 - locking mechanism for creating browser instance to avoid spawning multiple browsers when race condition appears
-- just closing the puppeteer page when request is aborted to avoid background running tasks in puppeteer
-- 1 GB RAM + 1 Core VPS on Ubuntu 22, systemd process that handles running app, nginx as reverse-proxy for app.
+- mechanism to close the puppeteer page when request is aborted to avoid background running tasks in puppeteer
+- systemd process that handles running and restarting app, nginx as reverse-proxy, certbot for handling ssl.
 
 ## Links
 - [puppeteer-extra](https://github.com/berstend/puppeteer-extra)

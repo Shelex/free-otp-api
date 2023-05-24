@@ -1,6 +1,6 @@
 import { Page } from 'puppeteer';
 import { consola } from 'consola';
-
+import { tryParseOtpCode } from './parseOtp.js';
 import { delay, parseTimeAgo, stringifyTriggerOtpTimeDiff } from '../time/utils.js';
 
 const baseUrl = 'https://receive-sms-free.cc';
@@ -88,6 +88,7 @@ interface Message {
   ago: number;
   textAgo: string;
   message: string;
+  otp?: string;
 }
 
 const parseMessages = async (page: Page) => {
@@ -126,6 +127,7 @@ export const recursivelyCheckMessages = async (page: Page, askedAt: number, matc
   const match = parsed.find((parsed) => parsed?.ago >= askedAt && parsed?.message?.includes(matcher));
 
   if (match) {
+    match.otp = tryParseOtpCode(match.message);
     return match;
   }
 
@@ -144,7 +146,7 @@ export const recursivelyCheckMessages = async (page: Page, askedAt: number, matc
     await page.waitForNavigation();
   }
 
-  await delay(5);
+  await delay(3);
   return recursivelyCheckMessages(page, askedAt, matcher);
 };
 
