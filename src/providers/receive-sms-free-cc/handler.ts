@@ -38,7 +38,7 @@ const numberIsOnline = async (page: Page, country: string, phoneNumber: string) 
 
 interface Message {
   ago: number;
-  textAgo: string;
+  agoText: string;
   message: string;
   otp?: string;
 }
@@ -65,7 +65,7 @@ const parseMessages = async (page: Page) => {
 
       return {
         ago: agoParsed,
-        textAgo: ago,
+        agoText: ago,
         message: remainingFields
       } as Message;
     });
@@ -85,7 +85,7 @@ export const recursivelyCheckMessages = async (page: Page, askedAt: number, matc
 
   consola.info(
     `not found message within ${stringifyTriggerOtpTimeDiff(askedAt)} range, latest ${
-      parsed.shift()?.textAgo
+      parsed.shift()?.agoText
     }, will try after ${recheckDelay}s...`
   );
 
@@ -123,7 +123,7 @@ export const handleReceiveSmsFreeCC = async (
 
   const match = await recursivelyCheckMessages(page, askedOtpAt, matcher);
 
-  match && consola.success(`found otp message ${match.textAgo}: "${match.message}"`);
+  match && consola.success(`found otp message ${match.agoText}: "${match.message}"`);
 
   return match;
 };

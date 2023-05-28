@@ -2,6 +2,9 @@
 
 Just one simple stupid endpoint to get specific sms for specific phone number to use in tests which involve a lot of otp codes.
 
+
+<a href="https://otp.shelex.dev/docs"><img src="https://raw.githubusercontent.com/swagger-api/swagger.io/wordpress/images/assets/SW-logo-clr.png" height="50"></a>
+
 ## Description
 
 - supports `receive-sms-free.cc` free otp code provider for now
@@ -17,6 +20,9 @@ Just one simple stupid endpoint to get specific sms for specific phone number to
 - returns sms that matches provided inputs, you have just to parse OTP code from it :)
 
 ## Examples
+
+Swagger is available at https://otp.shelex.dev/docs
+
 - successful response for `GET https://otp.shelex.dev/USA/19137886215?match=Amazon&ago=1h`:
     ```json
     {
@@ -30,7 +36,7 @@ Just one simple stupid endpoint to get specific sms for specific phone number to
         },
         "result": {
             "ago": 1684535779458,
-            "textAgo": "51 mins ago",
+            "agoText": "51 mins ago",
             "message": "Amazon: Your code is 228438. Don't share it. If you didn't request it, deny here https://amazon.com/a/c/r/lnqyxK8ckySBXJNgvdp014rIO",
             "otp": "228438"
         }
@@ -66,6 +72,7 @@ Just one simple stupid endpoint to get specific sms for specific phone number to
 - `puppeteer-cluster` for handling puppeteer instance, pages and consume tasks
 - `puppeteer-extra` + plugins is used to bypass cloudflare protection
 - `fastify` as web framework
+-  `@fastify/swagger` and `@fastify/swagger-ui` for api playground
 - locking mechanism for creating browser instance to avoid spawning multiple browsers when race condition appears
 - mechanism to close the puppeteer page when request is aborted to avoid background running tasks in puppeteer
 - systemd process that handles running and restarting app, nginx as reverse-proxy, certbot for handling ssl.
