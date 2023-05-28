@@ -2,14 +2,11 @@ import Fastify from 'fastify';
 import { browser } from './browser/cluster.js';
 import { consola } from 'consola';
 import { parseTimeAgo } from './time/utils.js';
-import { getPhoneNumberUrl, handleReceiveSmsFreeCC } from './providers/receive-sms-free-cc.js';
+import { getPhoneNumberUrl, handleReceiveSmsFreeCC } from './providers/receive-sms-free-cc/index.js';
 import { schema } from './schema.js';
+import { setGracefulShutdown } from './gracefulShutdown.js';
 
 const app = Fastify();
-
-(async () => {
-  await browser.createCluster();
-})();
 
 app.get<{
   Querystring: {
@@ -47,7 +44,6 @@ app.get<{
     });
     reply.send({ requested, result });
   } catch (error) {
-    consola.info(`in catch`);
     consola.error(error);
     reply.status(400);
     reply.send({ requested, error: (error as Error)?.message });
@@ -61,23 +57,6 @@ setInterval(async () => {
 
 app.listen({ port: parseInt(process.env.PORT || '') || 3030 }, (err) => {
   if (err) throw err;
-  // Server is now listening on
 });
 
-process.on('SIGINT', async () => {
-  consola.info(`Received SIGINT. Closing...`);
-  await browser.closeCluster();
-  process.exit(0);
-});
-
-process.on('SIGTERM', async () => {
-  consola.info(`Received SIGTERM. Closing...`);
-  await browser.closeCluster();
-  process.exit(0);
-});
-
-process.on('SIGHUP', async () => {
-  consola.info(`Received SIGHUP. Closing...`);
-  await browser.closeCluster();
-  process.exit(0);
-});
+setGracefulShutdown();

@@ -1,4 +1,4 @@
-import { countries } from './providers/receive-sms-free-cc.js';
+import { countries } from './providers/receive-sms-free-cc/countries.js';
 
 const queryStringJsonSchema = {
   type: 'object',

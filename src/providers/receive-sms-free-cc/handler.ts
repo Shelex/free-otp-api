@@ -1,59 +1,11 @@
 import { Page } from 'puppeteer';
 import { consola } from 'consola';
-import { tryParseOtpCode } from './parseOtp.js';
-import { delay, parseTimeAgo, stringifyTriggerOtpTimeDiff } from '../time/utils.js';
+import { tryParseOtpCode } from '../parseOtp.js';
+import { delay, parseTimeAgo, stringifyTriggerOtpTimeDiff } from '../../time/utils.js';
+import { countries } from './countries.js';
 
 const baseUrl = 'https://receive-sms-free.cc';
-
-export const countries = [
-  'France',
-  'Netherlands',
-  'Finland',
-  'Denmark',
-  'Sweden',
-  'UK',
-  'USA',
-  'Spain',
-  'Canada',
-  'Belgium',
-  'Mexico',
-  'Kazakhstan',
-  'Germany',
-  'Philippines',
-  'Romania',
-  'Ukraine',
-  'Estonia',
-  'Italy',
-  'Latvia',
-  'CzechRepublic',
-  'Ireland',
-  'Morocco',
-  'Austria',
-  'Poland',
-  'China',
-  'Switzerland',
-  'Croatia',
-  'Portugal',
-  'HongKong',
-  'Myanmar',
-  'Israel',
-  'India',
-  'SouthAfrica',
-  'Macao',
-  'Indonesia',
-  'Japan',
-  'Korea',
-  'Serbia',
-  'Nigeria',
-  'Australia',
-  'Malaysia',
-  'Norway',
-  'Vietnam',
-  'NewZealand',
-  'Thailand',
-  'Moldova',
-  'TimorLeste'
-];
+const recheckDelay = 3; // seconds
 
 export const getPhoneNumberUrl = (country: string, phone: string) => {
   if (!countries.includes(country)) {
@@ -134,7 +86,7 @@ export const recursivelyCheckMessages = async (page: Page, askedAt: number, matc
   consola.info(
     `not found message within ${stringifyTriggerOtpTimeDiff(askedAt)} range, latest ${
       parsed.shift()?.textAgo
-    }, will try after 5s...`
+    }, will try after ${recheckDelay}s...`
   );
 
   const buttons = await page.$$('.btn-primary');
@@ -146,7 +98,7 @@ export const recursivelyCheckMessages = async (page: Page, askedAt: number, matc
     await page.waitForNavigation();
   }
 
-  await delay(3);
+  await delay(recheckDelay);
   return recursivelyCheckMessages(page, askedAt, matcher);
 };
 
@@ -167,7 +119,7 @@ export const handleReceiveSmsFreeCC = async (
     throw new Error('number returned 404');
   }
 
-  consola.success(`number is online`);
+  consola.success(`number ${phoneNumber} is online`);
 
   const match = await recursivelyCheckMessages(page, askedOtpAt, matcher);
 

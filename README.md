@@ -11,7 +11,7 @@ Just one simple stupid endpoint to get specific sms for specific phone number to
     - match (optional) - substring to look for in the sms
     - ago (optional, `30s` by default) - the max time ago to look for specific sms, units are `s` - secons, `m` - minutes, `h` - hours, for example: `10s`, `5m`, `1h`, etc.
 - has browser instance running on demand
-- each request will spawn a page in the browser, up to 10 pages.
+- each request will spawn a page in the browser, up to 15 pages.
 - every 10 minutes browser is closed to avoid memory issues with long-living browser.
 - recursively searches phone number page for latest sms by `match` substring or `ago` query parameter, refreshing page every 3 sec
 - returns sms that matches provided inputs, you have just to parse OTP code from it :)
@@ -31,7 +31,8 @@ Just one simple stupid endpoint to get specific sms for specific phone number to
         "result": {
             "ago": 1684535779458,
             "textAgo": "51 mins ago",
-            "message": "Amazon: Your code is 228438. Don't share it. If you didn't request it, deny here https://amazon.com/a/c/r/lnqyxK8ckySBXJNgvdp014rIO"
+            "message": "Amazon: Your code is 228438. Don't share it. If you didn't request it, deny here https://amazon.com/a/c/r/lnqyxK8ckySBXJNgvdp014rIO",
+            "otp": "228438"
         }
     }
     ```

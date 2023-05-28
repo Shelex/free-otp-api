@@ -16,7 +16,7 @@ const createCluster = async () => {
 
   const cluster = await Cluster.launch({
     concurrency: Cluster.CONCURRENCY_PAGE,
-    maxConcurrency: 10, // 10 pages at a time
+    maxConcurrency: 15, // 15 pages at a time
     timeout: 120 * 1000, // 2 minutes
     puppeteer,
     monitor: true,
