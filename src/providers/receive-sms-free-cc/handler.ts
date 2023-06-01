@@ -5,14 +5,22 @@ import { delay, parseTimeAgo, stringifyTriggerOtpTimeDiff } from '../../time/uti
 import { countries } from './countries.js';
 
 const baseUrl = 'https://receive-sms-free.cc';
-const recheckDelay = 3; // seconds
+const recheckDelay = 5; // seconds
+
+export const getCountryUrl = (country: string) => {
+  if (!countries.includes(country)) {
+    throw new Error(`country ${country} is not supported`);
+  }
+
+  return `${baseUrl}/Free-${country}-Phone-Number/`;
+};
 
 export const getPhoneNumberUrl = (country: string, phone: string) => {
   if (!countries.includes(country)) {
     throw new Error(`country ${country} is not supported`);
   }
 
-  return `${baseUrl}/Free-${country}-Phone-Number/${phone.replace('+', '')}/`;
+  return `${getCountryUrl(country)}${phone.replace('+', '')}/`;
 };
 
 const numberIsOnline = async (page: Page, country: string, phoneNumber: string) => {
@@ -126,4 +134,43 @@ export const handleReceiveSmsFreeCC = async (
   match && consola.success(`found otp message ${match.agoText}: "${match.message}"`);
 
   return match;
+};
+
+export const getPhoneNumbers = async (page: Page, country: string) => {
+  consola.start(`starting parsing numbers for ${country}`);
+  const url = getCountryUrl(country);
+
+  consola.success(`got url ${url}`);
+
+  await page.goto(url);
+
+  const numbers = await parseNumbersPage(page);
+
+  return numbers;
+};
+
+const parseNumbersPage = async (page: Page, phones: string[] = []): Promise<string[]> => {
+  consola.start(`parsing page...`);
+  await page.waitForSelector('.section04 .index-title', { timeout: 5000 });
+  consola.success(`can see pagination element`);
+  const phoneNumberElementsLocator = 'li a[href] > h2 > span';
+  const currentPagePhones = await page.$$eval(phoneNumberElementsLocator, (elements) =>
+    elements.map((el) => el?.textContent)
+  );
+
+  const currentPhones = currentPagePhones
+    .filter((phone) => Boolean(phone))
+    .map((phone) => (phone as string).replace('+1 ', ''));
+
+  phones.push(...currentPhones);
+
+  const nextPage = await page.$('.pagination > li.active + li');
+
+  if (nextPage) {
+    consola.info(`can see next page, visiting...`);
+    await nextPage.click();
+    return await parseNumbersPage(page, phones);
+  }
+
+  return phones;
 };

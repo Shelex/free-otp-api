@@ -17,7 +17,7 @@
     "dev": "npx nodemon ./src/app.ts",
     "build": "tsc",
     "prestart": "npm run build",
-    "start": "node dist/app.js"
+    "start": "node dist/src/app.js"
   },
   "dependencies": {
     "@fastify/swagger": "8.5.1",

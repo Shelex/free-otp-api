@@ -1,6 +1,6 @@
 # Free otp code api
 
-Just one simple stupid endpoint to get specific sms for specific phone number to use in tests which involve a lot of otp codes.
+Get list of phone numbers and specific sms for specific phone number to use in tests which involve a lot of otp codes.
 
 
 <a href="https://otp.shelex.dev/docs"><img src="https://raw.githubusercontent.com/swagger-api/swagger.io/wordpress/images/assets/SW-logo-clr.png" height="50"></a>
@@ -8,16 +8,17 @@ Just one simple stupid endpoint to get specific sms for specific phone number to
 ## Description
 
 - supports `receive-sms-free.cc` free otp code provider for now
-- has one and only method `GET https://otp.shelex.dev/{{country}}/{{phone}}?match={{substring}}&ago={{ago}}`
+- get otp code: `GET https://otp.shelex.dev/{{country}}/{{phone}}?match={{substring}}&ago={{ago}}`
     - country is a country name - USA, UK, Ukraine, Canada, Moldova, Spain... full list is on [receive-sms-free](https://receive-sms-free.cc/regions/) countries website, if specific country page is opened, the name is in url path, example: `Free-Netherlands-Phone-Number` -> `Netherlands`
     - phone - is a phone number as it is specified in url, 10-13 digits
     - match (optional) - substring to look for in the sms
     - ago (optional, `30s` by default) - the max time ago to look for specific sms, units are `s` - secons, `m` - minutes, `h` - hours, for example: `10s`, `5m`, `1h`, etc.
+    - recursively searches phone number page for latest sms by `match` substring or `ago` query parameter, refreshing page every 3 sec
+    - returns sms that matches provided inputs and tries to parse otp code.
+- get list of phone numbers per country: `GET https://otp.shelex.dev/list/{{country}}`
 - has browser instance running on demand
 - each request will spawn a page in the browser, up to 15 pages.
 - every 10 minutes browser is closed to avoid memory issues with long-living browser.
-- recursively searches phone number page for latest sms by `match` substring or `ago` query parameter, refreshing page every 3 sec
-- returns sms that matches provided inputs, you have just to parse OTP code from it :)
 
 ## Examples
 
@@ -64,6 +65,17 @@ Swagger is available at https://otp.shelex.dev/docs
         "code": "FST_ERR_VALIDATION",
         "error": "Bad Request",
         "message": "params/country must be equal to one of the allowed values"
+    }
+    ```
+
+- successful response for `GET https://otp.shelex.dev/list/Ukraine`:
+    ```json
+    {
+        "phones": [
+            "+380 970778327",
+            "+380 972568073",
+            "+380 966218950"
+        ]
     }
     ```
 

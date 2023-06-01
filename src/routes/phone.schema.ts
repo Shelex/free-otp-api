@@ -91,11 +91,7 @@ export const getOtpCodeSchema: FastifySchema = {
   querystring: querystringSchema,
   params: paramsSchema,
   response: {
-    200: {
-      ...replySchema
-    },
-    default: {
-      ...replyError
-    }
+    200: replySchema,
+    default: replyError
   }
 };
