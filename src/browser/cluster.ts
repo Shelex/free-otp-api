@@ -15,11 +15,10 @@ const createCluster = async () => {
   puppeteer.use(stealthPlugin()).use(adblockPlugin({ blockTrackers: true }));
 
   const cluster = await Cluster.launch({
-    concurrency: Cluster.CONCURRENCY_PAGE,
+    concurrency: Cluster.CONCURRENCY_CONTEXT,
     maxConcurrency: 15, // 15 pages at a time
     timeout: 120 * 1000, // 2 minutes
     puppeteer,
-    monitor: true,
     sameDomainDelay: 1000,
     puppeteerOptions: {
       headless: 'new',
@@ -80,7 +79,6 @@ class Puppeteer {
   }
 
   async refreshCluster() {
-    consola.info('refreshing cluster...');
     if (this.cluster) {
       consola.info('cluster available, waiting for idle...');
       await this.cluster.idle();
