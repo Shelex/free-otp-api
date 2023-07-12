@@ -17,7 +17,9 @@ export const getOtpCodeListenerHandler: WebsocketHandler = async function (
   const requested = {
     country: typedParams.country,
     phoneNumber: typedParams.phoneNumber,
-    match: Array.isArray(typedQuery.match) ? typedQuery.match?.map((m) => decodeURIComponent(m)) : [typedQuery.match],
+    match: Array.isArray(typedQuery.match)
+      ? typedQuery.match?.map((m) => decodeURIComponent(m))
+      : [decodeURIComponent(typedQuery.match || '')],
     ago: Date.now()
   };
 
@@ -27,29 +29,21 @@ export const getOtpCodeListenerHandler: WebsocketHandler = async function (
 
   const messages = [] as string[];
 
-  connection.socket.on('error', async () => {
-    connection.socket.close();
-  });
-
-  await ongoing(connection, req, requested, messages);
+  return await ongoing(connection, req, requested, messages);
 };
 
-const ongoing = async (connection: any, req: any, requested: any, messages: string[]): Promise<any> => {
+const ongoing = async (
+  connection: SocketStream,
+  req: FastifyRequest,
+  requested: any,
+  messages: string[]
+): Promise<any> => {
   try {
-    const result = (await browser.cluster?.execute(requested, async ({ page, data }) => {
-      connection.socket.on('close', async () => {
-        await page.close();
-      });
-
-      return await handleReceiveSmsFreeCC(page, {
-        country: data.country,
-        phoneNumber: `+${data.phoneNumber}`,
-        matcher: data.match,
-        isStreaming: true,
-        interval: 10,
-        askedOtpAt: data.ago
-      });
-    })) as Message[];
+    if (connection.socket.readyState !== connection.socket.OPEN) {
+      console.log(`connection closed`);
+      return;
+    }
+    const result = await pingPage(connection, requested);
 
     const newMessages = result.map((record) => record.message).filter((message) => !messages.includes(message)) || [];
     if (newMessages.length) {
@@ -60,13 +54,34 @@ const ongoing = async (connection: any, req: any, requested: any, messages: stri
     }
     await delay(5);
 
-    return await ongoing(connection, req, requested, messages);
+    return (
+      connection.socket.readyState === connection.socket.OPEN && (await ongoing(connection, req, requested, messages))
+    );
   } catch (error) {
     const message = (error as Error).message;
     if (!messages.includes(message)) {
       messages.push(message);
       connection.socket.send(message);
     }
-    return await ongoing(connection, req, requested, messages);
   }
 };
+
+const pingPage = async (connection: SocketStream, requested: any) =>
+  (await browser.cluster?.execute(requested, async ({ page, data }) => {
+    connection.socket.on('close', async () => {
+      console.log(`closing page due to close event from socket`);
+      await page.close();
+    });
+    connection.socket.on('error', async () => {
+      console.log(`closing page due to error`);
+      await page.close();
+    });
+    return await handleReceiveSmsFreeCC(page, {
+      country: data.country,
+      phoneNumber: `+${data.phoneNumber}`,
+      matcher: data.match,
+      isStreaming: true,
+      interval: 5,
+      askedOtpAt: data.ago
+    });
+  })) as Message[];

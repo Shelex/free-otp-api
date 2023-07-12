@@ -7,8 +7,8 @@ import websockets from './plugins/websocket.js';
 
 const app = Fastify();
 await app.register(swagger);
-await app.register(routes);
 await app.register(websockets);
+await app.register(routes);
 
 setInterval(async () => {
   await browser.refreshCluster();

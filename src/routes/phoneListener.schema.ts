@@ -16,7 +16,12 @@ export type Params = FromSchema<typeof paramsSchema>;
 const querystringSchema = {
   type: 'object',
   properties: {
-    match: { type: 'string', pattern: '^[0-9]+[smh]$' }
+    match: {
+      type: 'array',
+      items: {
+        type: 'string'
+      }
+    }
   }
 } as const;
 
@@ -32,6 +37,7 @@ export type ReplyListener = FromSchema<typeof replyListenerSchema>;
 
 export const getOtpCodeListenerSchema: FastifySchema = {
   params: paramsSchema,
+  querystring: querystringSchema,
   response: {
     200: replyListenerSchema,
     default: replyListenerSchema

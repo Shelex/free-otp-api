@@ -35,6 +35,7 @@
   },
   "devDependencies": {
     "@types/node": "18.15.11",
+    "@types/ws": "^8.5.5",
     "esbuild": "0.17.19",
     "eslint": "8.40.0",
     "eslint-config-prettier": "8.8.0",
