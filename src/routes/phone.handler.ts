@@ -32,7 +32,12 @@ export const getOtpCodeHandler: RouteHandler<{
         // just close the page when request canceled
         await page.close();
       });
-      return await handleReceiveSmsFreeCC(page, data.country, `+${data.phoneNumber}`, data.ago, data.match);
+      return await handleReceiveSmsFreeCC(page, {
+        country: data.country,
+        phoneNumber: `+${data.phoneNumber}`,
+        matcher: data.match,
+        askedOtpAt: data.ago
+      });
     });
     reply.send({ requested, result });
   } catch (error) {

@@ -5,7 +5,7 @@ import { delay, parseTimeAgo, stringifyTriggerOtpTimeDiff } from '../../time/uti
 import { countries } from './countries.js';
 
 const baseUrl = 'https://receive-sms-free.cc';
-const recheckDelay = 5; // seconds
+const defaultRecheckDelay = 5; // seconds
 
 export const getCountryUrl = (country: string) => {
   if (!countries.includes(country)) {
@@ -44,7 +44,7 @@ const numberIsOnline = async (page: Page, country: string, phoneNumber: string) 
   return title === 'Number Online';
 };
 
-interface Message {
+export interface Message {
   ago: number;
   agoText: string;
   message: string;
@@ -79,12 +79,31 @@ const parseMessages = async (page: Page) => {
     });
 };
 
-export const recursivelyCheckMessages = async (page: Page, askedAt: number, matcher: string): Promise<Message> => {
+export const recursivelyCheckMessages = async (
+  page: Page,
+  askedAt: number,
+  matcher: string | string[],
+  recheckDelay: number,
+  isStreaming?: boolean
+): Promise<Message | Message[]> => {
   await page.waitForNetworkIdle({ idleTime: 500 });
 
   const parsed = (await parseMessages(page)) || [];
 
-  const match = parsed.find((parsed) => parsed?.ago >= askedAt && parsed?.message?.includes(matcher));
+  const matches = parsed.filter(
+    (parsed) =>
+      parsed?.ago >= askedAt &&
+      (Array.isArray(matcher) ? matcher.some((m) => parsed?.message?.includes(m)) : parsed?.message?.includes(matcher))
+  );
+
+  if (isStreaming && matches.length) {
+    return matches.map((match) => ({
+      ...match,
+      ...{ otp: tryParseOtpCode(match.message) }
+    }));
+  }
+
+  const match = matches.at(0);
 
   if (match) {
     match.otp = tryParseOtpCode(match.message);
@@ -107,19 +126,22 @@ export const recursivelyCheckMessages = async (page: Page, askedAt: number, matc
   }
 
   await delay(recheckDelay);
-  return recursivelyCheckMessages(page, askedAt, matcher);
+  return recursivelyCheckMessages(page, askedAt, matcher, recheckDelay, isStreaming);
 };
 
-export const handleReceiveSmsFreeCC = async (
-  page: Page,
-  country: string,
-  phoneNumber: string,
-  askedOtpAt: number,
-  matcher: string
-) => {
+interface HandlerOptions {
+  country: string;
+  phoneNumber: string;
+  askedOtpAt?: number;
+  matcher: string | string[];
+  isStreaming?: boolean;
+  interval?: number;
+}
+
+export const handleReceiveSmsFreeCC = async (page: Page, options: HandlerOptions) => {
   consola.start(`starting automated check for otp`);
   consola.start(`checking number is online at ${baseUrl}`);
-  const isAlive = await numberIsOnline(page, country, phoneNumber);
+  const isAlive = await numberIsOnline(page, options.country, options.phoneNumber);
   if (!isAlive) {
     throw new Error('number is offline');
   }
@@ -127,11 +149,20 @@ export const handleReceiveSmsFreeCC = async (
     throw new Error('number returned 404');
   }
 
-  consola.success(`number ${phoneNumber} is online`);
+  consola.success(`number ${options.phoneNumber} is online`);
 
-  const match = await recursivelyCheckMessages(page, askedOtpAt, matcher);
+  const match = await recursivelyCheckMessages(
+    page,
+    options.askedOtpAt || 0,
+    options.matcher,
+    options?.interval || defaultRecheckDelay,
+    options?.isStreaming
+  );
 
-  match && consola.success(`found otp message ${match.agoText}: "${match.message}"`);
+  const areMultipleMatches = Array.isArray(match);
+
+  !areMultipleMatches && match && consola.success(`found otp message ${match.agoText}: "${match.message}"`);
+  areMultipleMatches && consola.success(`found ${match.length} otp messages`);
 
   return match;
 };

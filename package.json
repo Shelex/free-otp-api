@@ -22,6 +22,7 @@
   "dependencies": {
     "@fastify/swagger": "8.5.1",
     "@fastify/swagger-ui": "1.8.1",
+    "@fastify/websocket": "^8.2.0",
     "consola": "3.1.0",
     "dotenv": "16.0.3",
     "fastify": "4.17.0",
