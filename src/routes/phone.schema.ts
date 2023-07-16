@@ -17,6 +17,7 @@ const querystringSchema = {
   type: 'object',
   properties: {
     ago: { type: 'string', nullable: true, pattern: '^[0-9]+[smh]$', default: '30s' },
+    since: { type: 'number', nullable: true },
     match: { type: 'string', nullable: true }
   }
 } as const;

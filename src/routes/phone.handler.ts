@@ -15,9 +15,9 @@ export const getOtpCodeHandler: RouteHandler<{
   const requested = {
     country: params.country,
     phoneNumber: params.phoneNumber,
-    ago: parseTimeAgo(query.ago || '30s'),
-    agoText: query.ago,
-    match: decodeURIComponent(query.match || ''),
+    ago: query?.since || parseTimeAgo(query.ago || '30s'),
+    agoText: query?.ago,
+    match: decodeURIComponent(query?.match || ''),
     url: getPhoneNumberUrl(params.country, params.phoneNumber)
   };
 

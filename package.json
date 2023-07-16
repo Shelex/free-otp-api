@@ -22,7 +22,6 @@
   "dependencies": {
     "@fastify/swagger": "8.5.1",
     "@fastify/swagger-ui": "1.8.1",
-    "@fastify/websocket": "^8.2.0",
     "consola": "3.1.0",
     "dotenv": "16.0.3",
     "fastify": "4.17.0",
@@ -35,7 +34,6 @@
   },
   "devDependencies": {
     "@types/node": "18.15.11",
-    "@types/ws": "^8.5.5",
     "esbuild": "0.17.19",
     "eslint": "8.40.0",
     "eslint-config-prettier": "8.8.0",
