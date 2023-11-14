@@ -18,10 +18,6 @@ export const getCountryUrl = (country: Country) => {
 };
 
 const getPhoneNumberUrl = (country: Country, phone: string) => {
-  if (!countries.includes(country)) {
-    throw new Error(`country ${country} is not supported`);
-  }
-
   return `${getCountryUrl(country)}${phone.replace('+', '')}/`;
 };
 

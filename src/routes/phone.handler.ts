@@ -23,15 +23,8 @@ export const getOtpCodeHandler: RouteHandler<{
 
   consola.info(`requested: ${JSON.stringify(requested, null, 2)}`);
 
-  await browser.createCluster();
-  if (!browser.cluster) {
-    reply.code(500).send({
-      error: 'failed to start browser session'
-    });
-    return;
-  }
-
   try {
+    await browser.createCluster();
     const result = await browser.cluster?.execute(requested, async ({ page, data }) => {
       req.raw.on('aborted', async () => {
         consola.info(`request aborted`);
@@ -47,7 +40,7 @@ export const getOtpCodeHandler: RouteHandler<{
     });
     reply.send({ requested, result });
   } catch (error) {
-    consola.error(error);
+    consola.warn(error);
     reply.code(400).send({ requested, error: (error as Error)?.message });
   }
 };

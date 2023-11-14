@@ -10,15 +10,8 @@ export const listPhonesHandler: RouteHandler<{
 }> = async function (req, reply) {
   const { params } = req;
 
-  await browser.createCluster();
-  if (!browser.cluster) {
-    reply.code(500).send({
-      error: 'failed to start browser session'
-    });
-    return;
-  }
-
   try {
+    await browser.createCluster();
     const queries = providers.map(async (provider) => {
       try {
         const result = (await browser.cluster?.execute(params.country, async ({ page, data }) => {
@@ -49,7 +42,7 @@ export const listPhonesHandler: RouteHandler<{
       phones: result
     });
   } catch (error) {
-    consola.error(error);
+    consola.warn(error);
     reply.code(400).send({ error: (error as Error)?.message });
   }
 };
