@@ -15,6 +15,6 @@ setInterval(async () => {
 
 setGracefulShutdown();
 
-app.listen({ port: parseInt(process.env.PORT || '') || 3030 }, (err) => {
+app.listen({ port: parseInt(process.env.PORT ?? '') || 3030 }, (err) => {
   if (err) throw err;
 });

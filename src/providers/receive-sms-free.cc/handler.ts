@@ -2,20 +2,22 @@ import { Page } from 'puppeteer';
 import { consola } from 'consola';
 import { tryParseOtpCode } from '../parseOtp.js';
 import { delay, parseTimeAgo, stringifyTriggerOtpTimeDiff } from '../../time/utils.js';
-import { countries } from './countries.js';
+import { countries, Countries } from './countries.js';
+import type { OtpRouteHandlerOptions, PhoneNumber } from '../types.js';
+import { defaultRecheckDelay } from '../constants.js';
+import { Country } from '../countries.js';
 
 const baseUrl = 'https://receive-sms-free.cc';
-const defaultRecheckDelay = 5; // seconds
 
-export const getCountryUrl = (country: string) => {
+export const getCountryUrl = (country: Country) => {
   if (!countries.includes(country)) {
-    throw new Error(`country ${country} is not supported`);
+    throw new Error(`country ${country} is not supported in ${baseUrl}`);
   }
 
-  return `${baseUrl}/Free-${country}-Phone-Number/`;
+  return `${baseUrl}/Free-${Countries[country as keyof typeof Countries]}-Phone-Number/`;
 };
 
-export const getPhoneNumberUrl = (country: string, phone: string) => {
+const getPhoneNumberUrl = (country: Country, phone: string) => {
   if (!countries.includes(country)) {
     throw new Error(`country ${country} is not supported`);
   }
@@ -23,7 +25,7 @@ export const getPhoneNumberUrl = (country: string, phone: string) => {
   return `${getCountryUrl(country)}${phone.replace('+', '')}/`;
 };
 
-const numberIsOnline = async (page: Page, country: string, phoneNumber: string) => {
+const numberIsOnline = async (page: Page, country: Country, phoneNumber: string) => {
   const url = getPhoneNumberUrl(country, phoneNumber);
 
   await page.goto(url);
@@ -49,6 +51,7 @@ export interface Message {
   agoText: string;
   message: string;
   otp?: string;
+  url: string;
 }
 
 const parseMessages = async (page: Page) => {
@@ -74,7 +77,8 @@ const parseMessages = async (page: Page) => {
       return {
         ago: agoParsed,
         agoText: ago,
-        message: remainingFields
+        message: remainingFields,
+        url: currentUrl
       } as Message;
     });
 };
@@ -83,8 +87,7 @@ export const recursivelyCheckMessages = async (
   page: Page,
   askedAt: number,
   matcher: string | string[],
-  recheckDelay: number,
-  isStreaming?: boolean
+  recheckDelay: number
 ): Promise<Message | Message[]> => {
   await page.waitForNetworkIdle({ idleTime: 500 });
 
@@ -96,7 +99,7 @@ export const recursivelyCheckMessages = async (
       (Array.isArray(matcher) ? matcher.some((m) => parsed?.message?.includes(m)) : parsed?.message?.includes(matcher))
   );
 
-  if (isStreaming && matches.length) {
+  if (matches.length) {
     return matches.map((match) => ({
       ...match,
       ...{ otp: tryParseOtpCode(match.message) }
@@ -126,19 +129,10 @@ export const recursivelyCheckMessages = async (
   }
 
   await delay(recheckDelay);
-  return recursivelyCheckMessages(page, askedAt, matcher, recheckDelay, isStreaming);
+  return recursivelyCheckMessages(page, askedAt, matcher, recheckDelay);
 };
 
-interface HandlerOptions {
-  country: string;
-  phoneNumber: string;
-  askedOtpAt?: number;
-  matcher: string | string[];
-  isStreaming?: boolean;
-  interval?: number;
-}
-
-export const handleReceiveSmsFreeCC = async (page: Page, options: HandlerOptions) => {
+export const handleReceiveSmsFreeCC = async (page: Page, options: OtpRouteHandlerOptions) => {
   consola.start(`starting automated check for otp`);
   consola.start(`checking number is online at ${baseUrl}`);
   const isAlive = await numberIsOnline(page, options.country, options.phoneNumber);
@@ -155,8 +149,7 @@ export const handleReceiveSmsFreeCC = async (page: Page, options: HandlerOptions
     page,
     options.askedOtpAt || 0,
     options.matcher,
-    options?.interval || defaultRecheckDelay,
-    options?.isStreaming
+    options?.interval || defaultRecheckDelay
   );
 
   const areMultipleMatches = Array.isArray(match);
@@ -164,10 +157,10 @@ export const handleReceiveSmsFreeCC = async (page: Page, options: HandlerOptions
   !areMultipleMatches && match && consola.success(`found otp message ${match.agoText}: "${match.message}"`);
   areMultipleMatches && consola.success(`found ${match.length} otp messages`);
 
-  return match;
+  return areMultipleMatches ? match.shift() : match;
 };
 
-export const getPhoneNumbers = async (page: Page, country: string) => {
+export const getReceiveSmsFreePhones = async (page: Page, country: Country): Promise<PhoneNumber[]> => {
   consola.start(`starting parsing numbers for ${country}`);
   const url = getCountryUrl(country);
 
@@ -177,7 +170,7 @@ export const getPhoneNumbers = async (page: Page, country: string) => {
 
   const numbers = await parseNumbersPage(page);
 
-  return numbers;
+  return numbers.map((phone) => ({ phone, url: getPhoneNumberUrl(country, phone) }));
 };
 
 const parseNumbersPage = async (page: Page, phones: string[] = []): Promise<string[]> => {
@@ -191,7 +184,7 @@ const parseNumbersPage = async (page: Page, phones: string[] = []): Promise<stri
 
   const currentPhones = currentPagePhones
     .filter((phone) => Boolean(phone))
-    .map((phone) => (phone as string).replace('+1 ', ''));
+    .map((phone) => (phone as string).replace('+1 ', '').replaceAll(' ', ''));
 
   phones.push(...currentPhones);
 

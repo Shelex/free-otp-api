@@ -1,11 +1,15 @@
 import { FromSchema } from 'json-schema-to-ts';
-import { countries } from '../providers/receive-sms-free-cc/countries.js';
 import { FastifySchema } from 'fastify';
+import { Source, allowedCountries } from '../providers/index.js';
 
 const listParamsSchema = {
   type: 'object',
   properties: {
-    country: { type: 'string', enum: countries, default: 'USA' }
+    country: {
+      type: 'string',
+      enum: allowedCountries,
+      default: 'USA'
+    }
   },
   required: ['country']
 } as const;
@@ -19,7 +23,12 @@ export const replyListSchema = {
     phones: {
       type: 'array',
       items: {
-        type: 'string'
+        type: 'object',
+        properties: {
+          url: { type: 'string' },
+          value: { type: 'string' },
+          source: { type: 'string', enum: Object.values(Source) }
+        }
       }
     }
   },
@@ -41,6 +50,8 @@ export type ReplyList = FromSchema<typeof replyListSchema>;
 export type ReplyListError = FromSchema<typeof replyListError>;
 
 export const listPhonesSchema: FastifySchema = {
+  tags: ['Free Phones'],
+  summary: 'Get list of available phone numbers',
   params: listParamsSchema,
   response: {
     200: replyListSchema,

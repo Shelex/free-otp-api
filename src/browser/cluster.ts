@@ -63,9 +63,14 @@ class Puppeteer {
       return;
     }
 
-    this.cluster = await createCluster();
-    await this.cluster.idle();
-    creatingCluster.release();
+    try {
+      this.cluster = await createCluster();
+      await this.cluster.idle();
+    } catch (e) {
+      consola.error(`failed to create cluster: ${JSON.stringify(e, null, 2)}`);
+    } finally {
+      creatingCluster.release();
+    }
   }
 
   async closeCluster() {
@@ -74,15 +79,23 @@ class Puppeteer {
       return;
     }
 
-    await this.cluster.close();
-    this.cluster = undefined;
+    try {
+      await this.cluster.close();
+      this.cluster = undefined;
+    } catch (e) {
+      consola.error(`failed to close cluster: ${JSON.stringify(e, null, 2)}`);
+    }
   }
 
   async refreshCluster() {
     if (this.cluster) {
       consola.info('cluster available, waiting for idle...');
-      await this.cluster.idle();
-      await this.closeCluster();
+      try {
+        await this.cluster.idle();
+        await this.closeCluster();
+      } catch (e) {
+        consola.error(`failed to refresh cluster: ${JSON.stringify(e, null, 2)}`);
+      }
     }
   }
 }
