@@ -8,7 +8,7 @@ const authZeroPage = {
     username: 'input#username',
     password: 'input#password'
   },
-  submit: 'button[type="submit"]'
+  submit: 'button[type="submit"][data-action-button-primary="true"]'
 };
 
 const resultPage = {
@@ -17,13 +17,12 @@ const resultPage = {
 };
 
 export const getAuthZeroAccessToken = async (page: Page, options: AuthZeroBody) => {
-  consola.start(`opening ui for ${options.url} and ${options.username}`);
   try {
     await page.goto(options.url);
     await page.waitForSelector(authZeroPage.logo, { visible: true });
     await page.type(authZeroPage.inputs.username, options.username);
     await page.type(authZeroPage.inputs.password, options.password);
-    await (await page.$$(authZeroPage.submit)).at(1)?.click();
+    await (await page.$(authZeroPage.submit))?.click();
     await page.waitForSelector(resultPage.success, { visible: true });
     await page.waitForSelector(resultPage.token);
     const accessToken = await page.evaluate((selector) => {

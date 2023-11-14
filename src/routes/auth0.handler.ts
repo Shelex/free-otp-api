@@ -12,6 +12,13 @@ export const authZeroHandler: RouteHandler<{
 
   await browser.createCluster();
 
+  if (!browser.cluster) {
+    reply.code(500).send({
+      error: 'failed to start browser session'
+    });
+    return;
+  }
+
   try {
     const result = await browser.cluster?.execute(body, async ({ page, data }) => {
       req.raw.on('aborted', async () => {

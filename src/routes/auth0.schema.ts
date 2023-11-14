@@ -39,6 +39,8 @@ export type ReplyAuthZero = FromSchema<typeof replyAuthZeroSchema>;
 export type ReplyAuthZeroError = FromSchema<typeof replyAuthZeroError>;
 
 export const authZeroSchema: FastifySchema = {
+  tags: ['Auth0'],
+  summary: 'Get Auth0 token from openID connect debugger page',
   body: authZeroBodySchema,
   response: {
     200: replyAuthZeroSchema,

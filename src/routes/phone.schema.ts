@@ -1,11 +1,15 @@
 import { FromSchema } from 'json-schema-to-ts';
-import { countries } from '../providers/receive-sms-free-cc/countries.js';
 import { FastifySchema } from 'fastify';
+import { allowedCountries, Source } from '../providers/index.js';
 
 const paramsSchema = {
   type: 'object',
   properties: {
-    country: { type: 'string', enum: countries, default: 'USA' },
+    country: {
+      type: 'string',
+      enum: allowedCountries,
+      default: 'USA'
+    },
     phoneNumber: { type: 'string', minLength: 10, maxLength: 13, pattern: '^[0-9]+$', default: '19137886215' }
   },
   required: ['country', 'phoneNumber']
@@ -16,9 +20,22 @@ export type Params = FromSchema<typeof paramsSchema>;
 const querystringSchema = {
   type: 'object',
   properties: {
-    ago: { type: 'string', nullable: true, pattern: '^[0-9]+[smh]$', default: '30s' },
-    since: { type: 'number', nullable: true },
-    match: { type: 'string', nullable: true }
+    ago: {
+      type: 'string',
+      description: 'specify relative time since last sms received',
+      nullable: true,
+      pattern: '^[0-9]+[smh]$',
+      default: '30s'
+    },
+    since: { type: 'number', description: 'specify exact timestamp since last sms received', nullable: true },
+    match: { type: 'string', description: 'specify substring to match in sms', nullable: true },
+    source: {
+      type: 'string',
+      description: 'specify phone number provider',
+      enum: Object.values(Source),
+      default: Source.ReceiveSmsFree,
+      nullable: true
+    }
   }
 } as const;
 
@@ -46,9 +63,6 @@ export const replySchema = {
         },
         match: {
           type: 'string'
-        },
-        url: {
-          type: 'string'
         }
       }
     },
@@ -65,6 +79,9 @@ export const replySchema = {
           type: 'string'
         },
         otp: {
+          type: 'string'
+        },
+        url: {
           type: 'string'
         }
       }
@@ -89,6 +106,8 @@ export const replyError = {
 export type ReplyError = FromSchema<typeof replyError>;
 
 export const getOtpCodeSchema: FastifySchema = {
+  tags: ['Free Phones'],
+  summary: 'Get OTP code from phone number',
   querystring: querystringSchema,
   params: paramsSchema,
   response: {

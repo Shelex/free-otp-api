@@ -1,9 +1,9 @@
 import { type RouteHandler } from 'fastify';
 import { type Params, type Querystring, type Reply, type ReplyError } from './phone.schema.js';
-import { getPhoneNumberUrl, handleReceiveSmsFreeCC } from '../providers/receive-sms-free-cc/handler.js';
 import { parseTimeAgo } from '../time/utils.js';
 import { browser } from '../browser/cluster.js';
 import { consola } from 'consola';
+import { Source, Sources } from '../providers/index.js';
 
 export const getOtpCodeHandler: RouteHandler<{
   Querystring: Querystring;
@@ -11,19 +11,25 @@ export const getOtpCodeHandler: RouteHandler<{
   Reply: Reply | ReplyError;
 }> = async function (req, reply) {
   const { params, query } = req;
+  const provider = Sources[query?.source ?? Source.ReceiveSmsFree];
 
   const requested = {
     country: params.country,
     phoneNumber: params.phoneNumber,
     ago: query?.since || parseTimeAgo(query.ago || '30s'),
     agoText: query?.ago,
-    match: decodeURIComponent(query?.match || ''),
-    url: getPhoneNumberUrl(params.country, params.phoneNumber)
+    match: decodeURIComponent(query?.match || '')
   };
 
   consola.info(`requested: ${JSON.stringify(requested, null, 2)}`);
 
   await browser.createCluster();
+  if (!browser.cluster) {
+    reply.code(500).send({
+      error: 'failed to start browser session'
+    });
+    return;
+  }
 
   try {
     const result = await browser.cluster?.execute(requested, async ({ page, data }) => {
@@ -32,7 +38,7 @@ export const getOtpCodeHandler: RouteHandler<{
         // just close the page when request canceled
         await page.close();
       });
-      return await handleReceiveSmsFreeCC(page, {
+      return await provider.handleOtp(page, {
         country: data.country,
         phoneNumber: `+${data.phoneNumber}`,
         matcher: data.match,

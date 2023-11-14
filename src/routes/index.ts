@@ -16,15 +16,15 @@ export const routes = async (app: FastifyInstance) => {
   app.addSchema(replyAuthZeroError);
   app.route({
     method: 'GET',
-    url: '/:country/:phoneNumber',
-    schema: getOtpCodeSchema,
-    handler: getOtpCodeHandler
-  });
-  app.route({
-    method: 'GET',
     url: '/list/:country',
     schema: listPhonesSchema,
     handler: listPhonesHandler
+  });
+  app.route({
+    method: 'GET',
+    url: '/:country/:phoneNumber',
+    schema: getOtpCodeSchema,
+    handler: getOtpCodeHandler
   });
   app.route({
     method: 'POST',
