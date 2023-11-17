@@ -17,6 +17,10 @@ Get list of phone numbers and specific sms for specific phone number to use in t
     - 
 
 ## API
+- get list of countries available: 
+    ```bash
+        GET https://otp.shelex.dev/countries
+    ```
 - get list of phone numbers per country: 
     ```bash
         GET https://otp.shelex.dev/list/{{country}}
