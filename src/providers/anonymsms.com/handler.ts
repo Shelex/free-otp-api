@@ -5,7 +5,7 @@ import type { Message, OtpRouteHandlerOptions, PhoneNumber } from '../types.js';
 import { delay, parseTimeAgo, stringifyTriggerOtpTimeDiff } from '../../time/utils.js';
 import { tryParseOtpCode } from '../parseOtp.js';
 import { defaultRecheckDelay } from '../constants.js';
-import { Country } from '../countries.js';
+import { Country } from '../providers.js';
 
 const baseUrl = 'https://anonymsms.com';
 
@@ -17,11 +17,7 @@ export const getCountryUrl = (country: Country) => {
   return `${baseUrl}/${Countries[country as keyof typeof Countries]}/`;
 };
 
-const getPhoneNumberUrl = (country: Country, phone: string) => {
-  if (!countries.includes(country)) {
-    throw new Error(`country ${country} is not supported`);
-  }
-
+const getPhoneNumberUrl = (phone: string) => {
   return `${baseUrl}/number/${phone.replace('+', '')}/`;
 };
 
@@ -35,7 +31,7 @@ export const getAnonymSmsPhones = async (page: Page, country: Country): Promise<
 
   const numbers = await parseNumbersPage(page);
 
-  return numbers.map((phone) => ({ phone, url: getPhoneNumberUrl(country, phone) }));
+  return numbers.map((phone) => ({ phone, url: getPhoneNumberUrl(phone) }));
 };
 
 const parseNumbersPage = async (page: Page, phones: string[] = []): Promise<string[]> => {
@@ -56,9 +52,15 @@ const parseNumbersPage = async (page: Page, phones: string[] = []): Promise<stri
 };
 
 const numberIsOnline = async (page: Page, country: Country, phoneNumber: string) => {
-  const url = getPhoneNumberUrl(country, phoneNumber);
+  const url = getPhoneNumberUrl(phoneNumber);
 
   await page.goto(url);
+  await page.waitForNavigation({ waitUntil: 'domcontentloaded' });
+
+  const is404 = await page.$eval('section > h1', (h1) => h1.textContent === '404').catch(() => false);
+  if (is404) {
+    return false;
+  }
 
   await page.waitForSelector('.sim-info');
 
@@ -74,20 +76,22 @@ const parseMessages = async (page: Page) => {
 
   const unparsedRows = messageRows.map((row) => row.split('\n').filter((x) => x.trim()));
 
-  return unparsedRows.map((row) => {
-    const ago = row[2].trim().toLowerCase();
-    const agoParsed = parseTimeAgo(ago);
+  return unparsedRows
+    .map((row) => {
+      const ago = row[2].trim().toLowerCase();
+      const agoParsed = parseTimeAgo(ago);
 
-    return {
-      ago: agoParsed,
-      agoText: ago,
-      message: row[1].trim(),
-      url: page.url()
-    } as Message;
-  });
+      return {
+        ago: agoParsed,
+        agoText: ago,
+        message: row[1].trim(),
+        url: page.url()
+      } as Message;
+    })
+    .filter((message) => message.ago);
 };
 
-export const recursivelyCheckMessages = async (
+const recursivelyCheckMessages = async (
   page: Page,
   askedAt: number,
   matcher: string | string[],
@@ -96,6 +100,10 @@ export const recursivelyCheckMessages = async (
   await page.waitForNetworkIdle({ idleTime: 500 });
 
   const parsed = (await parseMessages(page)) || [];
+
+  if (!parsed.length) {
+    return [];
+  }
 
   const matches = parsed.filter(
     (parsed) =>
@@ -154,10 +162,5 @@ export const handleAnonymSms = async (page: Page, options: OtpRouteHandlerOption
     options?.interval || defaultRecheckDelay
   );
 
-  const areMultipleMatches = Array.isArray(match);
-
-  !areMultipleMatches && match && consola.success(`found otp message ${match.agoText}: "${match.message}"`);
-  areMultipleMatches && consola.success(`found ${match.length} otp messages`);
-
-  return areMultipleMatches ? match.shift() : match;
+  return match;
 };

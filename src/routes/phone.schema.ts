@@ -41,8 +41,29 @@ const querystringSchema = {
 
 export type Querystring = FromSchema<typeof querystringSchema>;
 
+const resultSchema = {
+  type: 'object',
+  properties: {
+    ago: {
+      type: 'number'
+    },
+    agoText: {
+      type: 'string'
+    },
+    message: {
+      type: 'string'
+    },
+    otp: {
+      type: 'string'
+    },
+    url: {
+      type: 'string'
+    }
+  }
+} as const;
+
 export const replySchema = {
-  $id: 'response',
+  $id: 'responsePhoneMessage',
   type: 'object',
   properties: {
     requested: {
@@ -66,25 +87,12 @@ export const replySchema = {
         }
       }
     },
-    result: {
-      type: 'object',
-      properties: {
-        ago: {
-          type: 'number'
-        },
-        agoText: {
-          type: 'string'
-        },
-        message: {
-          type: 'string'
-        },
-        otp: {
-          type: 'string'
-        },
-        url: {
-          type: 'string'
-        }
-      }
+    result: resultSchema,
+    results: {
+      description: 'if there are more than 1 match',
+      type: 'array',
+      items: resultSchema,
+      nullable: true
     }
   },
   additionalProperties: false
@@ -93,7 +101,7 @@ export const replySchema = {
 export type Reply = FromSchema<typeof replySchema>;
 
 export const replyError = {
-  $id: 'error',
+  $id: 'errorPhoneMessage',
   type: 'object',
   required: ['error'],
   properties: {

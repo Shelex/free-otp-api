@@ -1,5 +1,5 @@
 import { Page } from 'puppeteer';
-import { Country } from './countries.js';
+import { Country } from './index.js';
 
 export enum Source {
   ReceiveSmsFree = 'receive-sms-free.cc',
@@ -10,7 +10,9 @@ export enum Source {
 
 export interface Provider {
   getPhonesList: (page: Page, country: Country) => Promise<PhoneNumber[]>;
-  handleOtp: (page: Page, options: OtpRouteHandlerOptions) => Promise<Message | undefined>;
+  handleOtp: (page: Page, options: OtpRouteHandlerOptions) => Promise<Message | Message[] | undefined>;
+  countries: Country[];
+  getCountryUrl: (country: Country) => string;
 }
 
 export interface OtpRouteHandlerOptions {
@@ -32,4 +34,5 @@ export interface Message {
   message: string;
   otp?: string;
   url: string;
+  error?: string;
 }

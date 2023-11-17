@@ -38,7 +38,11 @@ export const getOtpCodeHandler: RouteHandler<{
         askedOtpAt: data.ago
       });
     });
-    reply.send({ requested, result });
+    reply.send({
+      requested,
+      result: Array.isArray(result) ? result.at(0) : result,
+      results: result.length > 1 ? result : []
+    });
   } catch (error) {
     consola.warn(error);
     reply.code(400).send({ requested, error: (error as Error)?.message });

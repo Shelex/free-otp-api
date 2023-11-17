@@ -1,4 +1,3 @@
-import { consola } from 'consola';
 import { AuthZeroBody } from '../../routes/auth0.schema.js';
 import { Page } from 'puppeteer';
 

@@ -3,9 +3,11 @@ import fp from 'fastify-plugin';
 import { getOtpCodeSchema, replyError, replySchema } from './phone.schema.js';
 import { listPhonesSchema, replyListError, replyListSchema } from './list.schema.js';
 import { authZeroSchema, replyAuthZeroError, replyAuthZeroSchema } from './auth0.schema.js';
+import { listCountriesSchema, replyCountriesError, replyCountriesSchema } from './countries.schema.js';
 import { getOtpCodeHandler } from './phone.handler.js';
 import { listPhonesHandler } from './list.handler.js';
 import { authZeroHandler } from './auth0.handler.js';
+import { listCountriesHandler } from './countries.handler.js';
 
 export const routes = async (app: FastifyInstance) => {
   app.addSchema(replySchema);
@@ -14,6 +16,9 @@ export const routes = async (app: FastifyInstance) => {
   app.addSchema(replyListError);
   app.addSchema(replyAuthZeroSchema);
   app.addSchema(replyAuthZeroError);
+  app.addSchema(replyCountriesSchema);
+  app.addSchema(replyCountriesError);
+
   app.route({
     method: 'GET',
     url: '/list/:country',
@@ -31,6 +36,12 @@ export const routes = async (app: FastifyInstance) => {
     url: '/auth0',
     schema: authZeroSchema,
     handler: authZeroHandler
+  });
+  app.route({
+    method: 'GET',
+    url: '/countries',
+    schema: listCountriesSchema,
+    handler: listCountriesHandler
   });
 };
 

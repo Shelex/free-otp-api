@@ -1,3 +1,5 @@
+import { Country } from '../providers.js';
+
 export enum Countries {
   USA = 'united-states',
   UK = 'united-kingdom',
@@ -6,4 +8,4 @@ export enum Countries {
   Germany = 'germany'
 }
 
-export const countries = Object.keys(Countries);
+export const countries = Object.keys(Countries) as Country[];

@@ -5,7 +5,7 @@ import type { Message, OtpRouteHandlerOptions, PhoneNumber } from '../types.js';
 import { delay, parseTimeAgo, stringifyTriggerOtpTimeDiff } from '../../time/utils.js';
 import { tryParseOtpCode } from '../parseOtp.js';
 import { defaultRecheckDelay } from '../constants.js';
-import { Country } from '../countries.js';
+import { Country } from '../providers.js';
 
 const baseUrl = 'https://smstome.com';
 
@@ -88,19 +88,21 @@ const parseMessages = async (page: Page) => {
 
   const unparsedRows = messageRows.map((row) => row.split('\n').filter((x) => x?.trim()));
 
-  return unparsedRows.map((row) => {
-    const [, ago, ...messages] = row.map((td) => td?.trim());
-    const agoParsed = parseTimeAgo(ago);
+  return unparsedRows
+    .map((row) => {
+      const [, ago, ...messages] = row.map((td) => td?.trim());
+      const agoParsed = parseTimeAgo(ago);
 
-    return {
-      ago: agoParsed,
-      agoText: ago,
-      message: messages.join(' ')
-    } as Message;
-  });
+      return {
+        ago: agoParsed,
+        agoText: ago,
+        message: messages.join(' ')
+      } as Message;
+    })
+    .filter((message) => message.ago);
 };
 
-export const recursivelyCheckMessages = async (
+const recursivelyCheckMessages = async (
   page: Page,
   askedAt: number,
   matcher: string | string[],
@@ -109,6 +111,10 @@ export const recursivelyCheckMessages = async (
   await page.waitForNetworkIdle({ idleTime: 500 });
 
   const parsed = (await parseMessages(page)) || [];
+  console.log(parsed);
+  if (!parsed.length) {
+    return [];
+  }
 
   const matches = parsed.filter(
     (parsed) =>
@@ -168,10 +174,5 @@ export const handleSmsToMe = async (page: Page, options: OtpRouteHandlerOptions)
     options?.interval || defaultRecheckDelay
   );
 
-  const areMultipleMatches = Array.isArray(match);
-
-  !areMultipleMatches && match && consola.success(`found otp message ${match.agoText}: "${match.message}"`);
-  areMultipleMatches && consola.success(`found ${match.length} otp messages`);
-
-  return areMultipleMatches ? match.shift() : match;
+  return match;
 };

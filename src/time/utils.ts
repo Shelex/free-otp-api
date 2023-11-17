@@ -52,13 +52,19 @@ export const stringifyTriggerOtpTimeDiff = (timestamp: number) => {
   const diff = now - timestamp;
 
   const seconds = Math.floor(diff / 1000);
-  const minutes = Math.floor(seconds / 60);
-  const hours = Math.floor(minutes / 60);
+  const minutes = Math.ceil(seconds / 60);
+  const hours = Math.ceil(minutes / 60);
+  const days = Math.ceil(hours / 24);
+  const weeks = Math.ceil(days / 7);
+  const years = Math.ceil(days / 365);
 
   const units = {
     second: seconds % 60,
     minute: minutes % 60,
-    hour: hours
+    hour: hours % 24,
+    day: days % 365,
+    weeks: weeks % 52,
+    year: years
   };
 
   const unitNames = Object.keys(units) as (keyof typeof units)[];

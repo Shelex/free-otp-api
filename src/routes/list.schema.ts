@@ -17,7 +17,7 @@ const listParamsSchema = {
 export type ListParams = FromSchema<typeof listParamsSchema>;
 
 export const replyListSchema = {
-  $id: 'responseList',
+  $id: 'responsePhonesList',
   type: 'object',
   properties: {
     phones: {
@@ -36,7 +36,7 @@ export const replyListSchema = {
 } as const;
 
 export const replyListError = {
-  $id: 'errorList',
+  $id: 'errorPhonesList',
   type: 'object',
   required: ['error'],
   properties: {

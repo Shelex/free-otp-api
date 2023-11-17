@@ -5,7 +5,7 @@ import { delay, parseTimeAgo, stringifyTriggerOtpTimeDiff } from '../../time/uti
 import { countries, Countries } from './countries.js';
 import type { OtpRouteHandlerOptions, PhoneNumber } from '../types.js';
 import { defaultRecheckDelay } from '../constants.js';
-import { Country } from '../countries.js';
+import { Country } from '../providers.js';
 
 const baseUrl = 'https://receive-sms-free.cc';
 
@@ -76,10 +76,11 @@ const parseMessages = async (page: Page) => {
         message: remainingFields,
         url: currentUrl
       } as Message;
-    });
+    })
+    .filter((message) => message.ago);
 };
 
-export const recursivelyCheckMessages = async (
+const recursivelyCheckMessages = async (
   page: Page,
   askedAt: number,
   matcher: string | string[],
@@ -88,6 +89,9 @@ export const recursivelyCheckMessages = async (
   await page.waitForNetworkIdle({ idleTime: 500 });
 
   const parsed = (await parseMessages(page)) || [];
+  if (!parsed.length) {
+    return [];
+  }
 
   const matches = parsed.filter(
     (parsed) =>
@@ -148,12 +152,7 @@ export const handleReceiveSmsFreeCC = async (page: Page, options: OtpRouteHandle
     options?.interval || defaultRecheckDelay
   );
 
-  const areMultipleMatches = Array.isArray(match);
-
-  !areMultipleMatches && match && consola.success(`found otp message ${match.agoText}: "${match.message}"`);
-  areMultipleMatches && consola.success(`found ${match.length} otp messages`);
-
-  return areMultipleMatches ? match.shift() : match;
+  return match;
 };
 
 export const getReceiveSmsFreePhones = async (page: Page, country: Country): Promise<PhoneNumber[]> => {
