@@ -111,7 +111,6 @@ const recursivelyCheckMessages = async (
   await page.waitForNetworkIdle({ idleTime: 500 });
 
   const parsed = (await parseMessages(page)) || [];
-  console.log(parsed);
   if (!parsed.length) {
     return [];
   }
