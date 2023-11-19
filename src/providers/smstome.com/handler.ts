@@ -11,7 +11,7 @@ const baseUrl = 'https://smstome.com';
 
 export const getCountryUrl = (country: Country) => {
   if (!countries.includes(country)) {
-    throw new Error(`country ${country} is not supported in ${baseUrl}`);
+    return '';
   }
 
   return `${baseUrl}/country/${Countries[country as keyof typeof Countries]}`;
@@ -22,6 +22,10 @@ export const getSmsToMeComPhones = async (page: Page, country: Country) => {
   const url = getCountryUrl(country);
 
   consola.success(`got url ${url}`);
+
+  if (!url) {
+    return [];
+  }
 
   await page.goto(url);
 
@@ -51,7 +55,7 @@ const parseNumbersPage = async (page: Page, target?: string, phones: PhoneNumber
   const paginationLocator = 'div.pagination > a';
   const links = await page.$$eval(paginationLocator, (elements) => elements.map((a) => a.href));
   const next = links.at(-1);
-  if (!next) {
+  if (!next || next === page.url()) {
     return phones;
   }
   await page.goto(next);
@@ -62,6 +66,10 @@ const numberIsOnline = async (page: Page, country: Country, phoneNumber: string)
   consola.info(`numberIsOnline, country: ${country}, phoneNumber: ${phoneNumber}`);
   const url = getCountryUrl(country);
   consola.success(`got country url ${url}`);
+
+  if (!url) {
+    return false;
+  }
   await page.goto(url);
   const [found] = await parseNumbersPage(page, phoneNumber);
 

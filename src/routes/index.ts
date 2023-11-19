@@ -45,4 +45,11 @@ export const routes = async (app: FastifyInstance) => {
   });
 };
 
-export default fp(routes);
+export const withPrefix = fp(
+  async function (app) {
+    app.register(routes, { prefix: '/api' });
+  },
+  { name: 'api-prefix-route' }
+);
+
+export default withPrefix;

@@ -15,10 +15,16 @@ export const listPhonesHandler: RouteHandler<{
     const queries = providers.map(async (provider) => {
       try {
         const result = (await browser.cluster?.execute(params.country, async ({ page, data }) => {
+          browser.registerPageHandlers(page);
+          req.raw.on('close', async () => {
+            if (req.raw.destroyed && !page?.isClosed()) {
+              await page?.close();
+            }
+          });
           req.raw.on('aborted', async () => {
             consola.info(`request aborted`);
             // just close the page when request canceled
-            await page.close();
+            !page?.isClosed() && (await page.close());
           });
           return await provider.getPhonesList(page, data);
         })) as PhoneNumber[];

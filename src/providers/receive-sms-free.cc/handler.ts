@@ -11,14 +11,15 @@ const baseUrl = 'https://receive-sms-free.cc';
 
 export const getCountryUrl = (country: Country) => {
   if (!countries.includes(country)) {
-    throw new Error(`country ${country} is not supported in ${baseUrl}`);
+    return '';
   }
 
   return `${baseUrl}/Free-${Countries[country as keyof typeof Countries]}-Phone-Number/`;
 };
 
 const getPhoneNumberUrl = (country: Country, phone: string) => {
-  return `${getCountryUrl(country)}${phone.replace('+', '')}/`;
+  const withCountryCode = country === 'USA' && !phone.startsWith('+') && !phone.startsWith('1') ? `1${phone}` : phone;
+  return `${getCountryUrl(country)}${withCountryCode.replace('+', '')}/`;
 };
 
 const numberIsOnline = async (page: Page, country: Country, phoneNumber: string) => {
@@ -160,6 +161,10 @@ export const getReceiveSmsFreePhones = async (page: Page, country: Country): Pro
   const url = getCountryUrl(country);
 
   consola.success(`got url ${url}`);
+
+  if (!url) {
+    return [];
+  }
 
   await page.goto(url);
 

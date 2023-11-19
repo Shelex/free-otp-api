@@ -11,14 +11,15 @@ const baseUrl = 'https://quackr.io/temporary-numbers';
 
 export const getCountryUrl = (country: Country) => {
   if (!countries.includes(country)) {
-    throw new Error(`country ${country} is not supported in ${baseUrl}`);
+    return '';
   }
 
   return `${baseUrl}/${Countries[country as keyof typeof Countries]}`;
 };
 
 const getPhoneNumberUrl = (country: Country, phone: string) => {
-  return `${getCountryUrl(country)}/${phone.replace('+', '')}`;
+  const withCountryCode = country === 'USA' && !phone.startsWith('+') && !phone.startsWith('1') ? `1${phone}` : phone;
+  return `${getCountryUrl(country)}/${withCountryCode.replace('+', '')}`;
 };
 
 export const getQuackrIoPhones = async (page: Page, country: Country): Promise<PhoneNumber[]> => {
@@ -26,6 +27,10 @@ export const getQuackrIoPhones = async (page: Page, country: Country): Promise<P
   const url = getCountryUrl(country);
 
   consola.success(`got url ${url}`);
+
+  if (!url) {
+    return [];
+  }
 
   await page.goto(url);
 

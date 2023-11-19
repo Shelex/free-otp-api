@@ -13,10 +13,16 @@ export const authZeroHandler: RouteHandler<{
   try {
     await browser.createCluster();
     const result = await browser.cluster?.execute(body, async ({ page, data }) => {
+      browser.registerPageHandlers(page);
+      req.raw.on('close', async () => {
+        if (req.raw.destroyed && !page?.isClosed()) {
+          await page?.close();
+        }
+      });
       req.raw.on('aborted', async () => {
         consola.info(`request aborted`);
         // just close the page when request canceled
-        await page.close();
+        !page?.isClosed() && (await page.close());
       });
       return await getAuthZeroAccessToken(page, data);
     });

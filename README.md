@@ -19,15 +19,15 @@ Get list of phone numbers and specific sms for specific phone number to use in t
 ## API
 - get list of countries available: 
     ```bash
-        GET https://otp.shelex.dev/countries
+        GET https://otp.shelex.dev/api/countries
     ```
 - get list of phone numbers per country: 
     ```bash
-        GET https://otp.shelex.dev/list/{{country}}
+        GET https://otp.shelex.dev/api/list/{{country}}
     ```
 - get otp code: 
     ```
-        GET https://otp.shelex.dev/{{country}}/{{phone}}?match={{substring}}&ago={{ago}}
+        GET https://otp.shelex.dev/api/{{country}}/{{phone}}?match={{substring}}&ago={{ago}}
     ```
     - `country` is a country name - USA, UK, Ukraine, Canada, Moldova, Spain... full list in [docs](https://otp.shelex.dev/docs/static/index.html) in "available values" section. Basically is a union of all supported countries across services.
     - `phone` - is a phone number as it is specified in url, 10-13 digits, without "+" sign

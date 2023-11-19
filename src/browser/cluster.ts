@@ -1,5 +1,5 @@
 import { Cluster } from 'puppeteer-cluster';
-import vanillaPuppeteer from 'puppeteer';
+import vanillaPuppeteer, { Page } from 'puppeteer';
 import { addExtra } from 'puppeteer-extra';
 import stealthPlugin from 'puppeteer-extra-plugin-stealth';
 import adblockPlugin from 'puppeteer-extra-plugin-adblocker';
@@ -62,15 +62,9 @@ class Puppeteer {
       consola.info('lock was not granted');
       return;
     }
-
-    try {
-      this.cluster = await createCluster();
-      await this.cluster.idle();
-    } catch (e) {
-      consola.error(`failed to create cluster: ${JSON.stringify(e, null, 2)}`);
-    } finally {
-      creatingCluster.release();
-    }
+    this.cluster = await createCluster();
+    await this.cluster.idle();
+    creatingCluster.release();
   }
 
   async closeCluster() {
@@ -78,25 +72,28 @@ class Puppeteer {
     if (!this.cluster) {
       return;
     }
-
-    try {
-      await this.cluster.close();
-      this.cluster = undefined;
-    } catch (e) {
-      consola.error(`failed to close cluster: ${JSON.stringify(e, null, 2)}`);
-    }
+    await this.cluster.close();
+    this.cluster = undefined;
   }
 
   async refreshCluster() {
     if (this.cluster) {
       consola.info('cluster available, waiting for idle...');
-      try {
-        await this.cluster.idle();
-        await this.closeCluster();
-      } catch (e) {
-        consola.error(`failed to refresh cluster: ${JSON.stringify(e, null, 2)}`);
-      }
+      await this.cluster.idle();
+      await this.closeCluster();
     }
+  }
+
+  registerPageHandlers(page: Page) {
+    page.on('error', (err) => {
+      consola.warn(`[cluster] error event: ${err.message}`);
+    });
+    page.on('pageerror', (err) => {
+      consola.warn(`[cluster] pageerror event: ${err.message}`);
+    });
+    page.on('workerdestroyed', () => {
+      consola.warn(`[cluster] workerdestroyed event`);
+    });
   }
 }
 

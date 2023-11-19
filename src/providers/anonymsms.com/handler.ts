@@ -11,7 +11,7 @@ const baseUrl = 'https://anonymsms.com';
 
 export const getCountryUrl = (country: Country) => {
   if (!countries.includes(country)) {
-    throw new Error(`country ${country} is not supported in ${baseUrl}`);
+    return '';
   }
 
   return `${baseUrl}/${Countries[country as keyof typeof Countries]}/`;
@@ -25,7 +25,9 @@ export const getAnonymSmsPhones = async (page: Page, country: Country): Promise<
   consola.start(`starting parsing numbers for ${country}`);
   const url = getCountryUrl(country);
 
-  consola.success(`got url ${url}`);
+  if (!url) {
+    return [];
+  }
 
   await page.goto(url);
 
