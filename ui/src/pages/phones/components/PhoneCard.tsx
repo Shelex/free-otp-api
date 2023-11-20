@@ -55,6 +55,8 @@ const PhoneCard: React.FC<Props> = ({ countryName, phone, loading }) => {
         )
       }
       onClick={() =>
+        phone &&
+        !loading &&
         navigate(
           `/messages/${countryName}/${phone?.source}/${(isUSA ? `1${phone?.value}` : phone?.value)
             ?.replace('+', '')

@@ -51,7 +51,7 @@ const CountryCard: React.FC<Props> = ({ country, loading }) => {
           />
         )
       }
-      onClick={() => navigate(`/phones/${country?.name}`)}
+      onClick={() => !loading && country && navigate(`/phones/${country?.name}`)}
     >
       <Row>
         {country?.sources?.map((source) => (
