@@ -14,6 +14,10 @@ export const listPhonesHandler: RouteHandler<{
     await browser.createCluster();
     const queries = providers.map(async (provider) => {
       try {
+        if (!provider.countries.includes(params.country)) {
+          return [];
+        }
+
         const result = (await browser.cluster?.execute(params.country, async ({ page, data }) => {
           browser.registerPageHandlers(page);
           req.raw.on('close', async () => {
