@@ -57,7 +57,7 @@ const numberIsOnline = async (page: Page, country: Country, phoneNumber: string)
   const url = getPhoneNumberUrl(phoneNumber);
 
   await page.goto(url);
-  await page.waitForNavigation({ waitUntil: 'domcontentloaded' });
+  await delay(1);
 
   const is404 = await page.$eval('section > h1', (h1) => h1.textContent === '404').catch(() => false);
   if (is404) {
