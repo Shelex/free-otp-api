@@ -26,7 +26,11 @@ const PhoneCard: React.FC<Props> = ({ countryName, phone, loading }) => {
       loading={loading}
       hoverable
       style={{ width: 240, height: 280, background: '#f5f5f5' }}
-      title={<Typography.Title level={5}>{phoneEdited}</Typography.Title>}
+      title={
+        <Typography.Title copyable={!loading} level={5}>
+          {phoneEdited}
+        </Typography.Title>
+      }
       bordered={true}
       cover={
         phone ? (
@@ -39,6 +43,15 @@ const PhoneCard: React.FC<Props> = ({ countryName, phone, loading }) => {
               width: '10em',
               height: '10em'
             }}
+            onClick={() =>
+              phone &&
+              !loading &&
+              navigate(
+                `/messages/${countryName}/${phone?.source}/${(isUSA ? `1${phone?.value}` : phone?.value)
+                  ?.replace('+', '')
+                  ?.trim()}?url=${phone?.url}`
+              )
+            }
           />
         ) : (
           <Skeleton
@@ -54,20 +67,12 @@ const PhoneCard: React.FC<Props> = ({ countryName, phone, loading }) => {
           />
         )
       }
-      onClick={() =>
-        phone &&
-        !loading &&
-        navigate(
-          `/messages/${countryName}/${phone?.source}/${(isUSA ? `1${phone?.value}` : phone?.value)
-            ?.replace('+', '')
-            ?.trim()}?url=${phone?.url}`
-        )
-      }
-    >
-      <Button size="small" type="dashed" target="_blank" href={phone?.url} key={uniqueId()}>
-        {phone?.source}
-      </Button>
-    </Card>
+      actions={[
+        <Typography.Link target="_blank" href={phone?.url} key={uniqueId()}>
+          {phone?.source}
+        </Typography.Link>
+      ]}
+    ></Card>
   ) : null;
 };
 

@@ -10,7 +10,6 @@ const App: React.FC = () => (
       <BrowserRouter basename={'/'}>
         <ConfigProvider
           theme={{
-            token: { colorPrimary: '#41b3a3' },
             components: {
               Card: {
                 headerHeight: 16

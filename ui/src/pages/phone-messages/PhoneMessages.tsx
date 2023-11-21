@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import useFetch from 'use-http';
+import useFetch, { CachePolicies } from 'use-http';
 import { baseUrl, endpoints } from '../../api';
 import { Message, PhoneMessagesResponse } from '../../types';
 import MessagesTable from './MessagesTable';
@@ -10,29 +10,41 @@ import { StepForwardOutlined, StepBackwardOutlined, RedoOutlined } from '@ant-de
 const PhoneMessages: React.FC = () => {
   const navigate = useNavigate();
   const country = useParams().country ?? '';
+  const phone = useParams().phone ?? '';
+  const source = useParams().source ?? '';
 
   const location = useLocation();
   const sourceUrl = new URLSearchParams(location.search).get('url');
 
-  const phone = useParams().phone ?? '';
-  const source = useParams().source ?? '';
-
   const [messages, setMessages] = useState<Message[]>([]);
 
-  const { error, get, loading, response } = useFetch(baseUrl);
+  const { error, get, loading, response } = useFetch(baseUrl, { cachePolicy: CachePolicies.NO_CACHE });
   const isFetching = useRef(false);
 
-  const getMessages = useCallback(async () => {
-    if (messages.length) {
-      return;
-    }
-    isFetching.current = true;
-    const messagesResponse: PhoneMessagesResponse = await get(endpoints.phoneMessages(country, phone, source));
-    isFetching.current = false;
-    if (response.ok) {
-      setMessages(messagesResponse?.results);
-    }
-  }, [messages, get, country, phone, source, response]);
+  const noMessages = response.ok && !messages.length;
+
+  const getMessages = useCallback(
+    async (refresh: boolean = false) => {
+      if (noMessages) {
+        return;
+      }
+
+      if (messages.length && !refresh) {
+        return;
+      }
+
+      if (messages.length && refresh) {
+        setMessages([]);
+      }
+      isFetching.current = true;
+      const messagesResponse: PhoneMessagesResponse = await get(endpoints.phoneMessages(country, phone, source));
+      isFetching.current = false;
+      if (response.ok) {
+        setMessages(messagesResponse?.results);
+      }
+    },
+    [noMessages, messages, get, country, phone, source, response]
+  );
 
   useEffect(() => {
     if (!country || !phone) {
@@ -48,15 +60,8 @@ const PhoneMessages: React.FC = () => {
         <Button icon={<StepBackwardOutlined />} onClick={() => navigate(`/phones/${country}`)}>
           To Phone Numbers
         </Button>
-        {response.ok && !messages.length ? 'No messages' : null}
         {messages.length ? (
-          <Button
-            icon={<RedoOutlined />}
-            onClick={() => {
-              setMessages([]);
-              navigate(0);
-            }}
-          >
+          <Button icon={<RedoOutlined />} onClick={async () => await getMessages(true)}>
             Refresh
           </Button>
         ) : null}
