@@ -1,4 +1,4 @@
-import { Button, Card, Skeleton, Typography } from 'antd';
+import { Card, Skeleton, Typography } from 'antd';
 import ReactCountryFlag from 'react-country-flag';
 import { PhoneRecord } from '../../../types';
 import { uniqueId } from 'lodash';
@@ -18,7 +18,7 @@ const PhoneCard: React.FC<Props> = ({ countryName, phone, loading }) => {
   const isAvailable = countryName && phone;
 
   const isUSA = phone?.value && countryName === 'USA';
-  const phoneEdited = isUSA ? `+1   ${phone.value}` : phone?.value;
+  const phoneEdited = isUSA ? `+1${phone.value}` : phone?.value;
 
   return isAvailable || loading ? (
     <Card

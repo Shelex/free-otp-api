@@ -1,4 +1,4 @@
-import { Tabs, notification } from 'antd';
+import { Empty, Tabs, notification } from 'antd';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import useFetch from 'use-http';
@@ -56,7 +56,7 @@ const PhoneNumbers: React.FC = () => {
         />
       )
     }));
-    if (!items.length) {
+    if (!items.length && isFetching.current) {
       return [
         {
           label: 'loading',
@@ -79,7 +79,7 @@ const PhoneNumbers: React.FC = () => {
     notification.error(error);
   }
 
-  return (
+  return !phones.length && !response.ok ? (
     <Tabs
       defaultActiveKey="1"
       centered
@@ -94,6 +94,8 @@ const PhoneNumbers: React.FC = () => {
         marginBottom: 0
       }}
     />
+  ) : (
+    <Empty style={{ marginTop: 100 }} description="Phone numbers not found" />
   );
 };
 
