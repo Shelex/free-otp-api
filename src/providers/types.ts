@@ -9,7 +9,8 @@ export enum Source {
 }
 
 export interface Provider {
-  getPhonesList: (page: Page, country: Country) => Promise<PhoneNumber[]>;
+  name: string;
+  getPhonesList: (page: Page, country: Country, url?: string) => Promise<PhoneNumberListReply>;
   handleOtp: (page: Page, options: OtpRouteHandlerOptions) => Promise<Message | Message[] | undefined>;
   countries: Country[];
   getCountryUrl: (country: Country) => string;
@@ -26,6 +27,11 @@ export interface OtpRouteHandlerOptions {
 export interface PhoneNumber {
   phone: string;
   url: string;
+}
+
+export interface PhoneNumberListReply {
+  phones: PhoneNumber[];
+  nextPageUrl?: string;
 }
 
 export interface Message {

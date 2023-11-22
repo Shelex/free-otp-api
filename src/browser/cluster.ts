@@ -15,8 +15,8 @@ const createCluster = async () => {
   puppeteer.use(stealthPlugin()).use(adblockPlugin({ blockTrackers: true }));
 
   const cluster = await Cluster.launch({
-    concurrency: Cluster.CONCURRENCY_CONTEXT,
-    maxConcurrency: 15, // 15 pages at a time
+    concurrency: Cluster.CONCURRENCY_PAGE,
+    maxConcurrency: 5, // 5 pages at a time
     timeout: 120 * 1000, // 2 minutes
     puppeteer,
     sameDomainDelay: 1000,
@@ -44,7 +44,7 @@ class Puppeteer {
   cluster?: Cluster;
   providers: Record<string, ProviderEntry[]> = {};
 
-  async createCluster() {
+  async createCluster(): Promise<void> {
     consola.info('Puppeteer.createCluster');
     if (this.cluster) {
       consola.info('Puppeteer cluster already available');
@@ -63,8 +63,14 @@ class Puppeteer {
       return;
     }
     this.cluster = await createCluster();
-    await this.cluster.idle();
     creatingCluster.release();
+    try {
+      await this.cluster.idle();
+    } catch (e) {
+      if (!this.cluster && !creatingCluster.isLocked) {
+        return await this.createCluster();
+      }
+    }
   }
 
   async closeCluster() {
@@ -87,12 +93,6 @@ class Puppeteer {
   registerPageHandlers(page: Page) {
     page.on('error', (err) => {
       consola.warn(`[cluster] error event: ${err.message}`);
-    });
-    page.on('pageerror', (err) => {
-      consola.warn(`[cluster] pageerror event: ${err.message}`);
-    });
-    page.on('workerdestroyed', () => {
-      consola.warn(`[cluster] workerdestroyed event`);
     });
   }
 }

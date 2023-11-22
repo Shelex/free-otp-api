@@ -79,7 +79,11 @@ const PhoneNumbers: React.FC = () => {
     notification.error(error);
   }
 
-  return !phones.length && !response.ok ? (
+  if (!phones.length && response.ok && !isFetching.current) {
+    return <Empty style={{ marginTop: 100 }} description="Phone numbers not found" />;
+  }
+
+  return (
     <Tabs
       defaultActiveKey="1"
       centered
@@ -94,8 +98,6 @@ const PhoneNumbers: React.FC = () => {
         marginBottom: 0
       }}
     />
-  ) : (
-    <Empty style={{ marginTop: 100 }} description="Phone numbers not found" />
   );
 };
 

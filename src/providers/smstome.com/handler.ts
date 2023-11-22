@@ -1,7 +1,7 @@
 import { Page } from 'puppeteer';
 import { consola } from 'consola';
 import { Countries, countries } from './countries.js';
-import type { Message, OtpRouteHandlerOptions, PhoneNumber } from '../types.js';
+import type { Message, OtpRouteHandlerOptions, PhoneNumberListReply } from '../types.js';
 import { delay, parseTimeAgo, stringifyTriggerOtpTimeDiff } from '../../time/utils.js';
 import { tryParseOtpCode } from '../parseOtp.js';
 import { defaultRecheckDelay } from '../constants.js';
@@ -17,31 +17,27 @@ export const getCountryUrl = (country: Country) => {
   return `${baseUrl}/country/${Countries[country as keyof typeof Countries]}`;
 };
 
-export const getSmsToMeComPhones = async (page: Page, country: Country) => {
+export const getSmsToMeComPhones = async (page: Page, country: Country, nextUrl?: string) => {
   consola.start(`starting parsing numbers for ${country}`);
-  const url = getCountryUrl(country);
+  const url = nextUrl ?? getCountryUrl(country);
 
   consola.success(`got url ${url}`);
 
   if (!url) {
-    return [];
+    return { phones: [] };
   }
 
-  await page.goto(url);
-
-  const numbers = await parseNumbersPage(page);
-
-  return numbers;
+  return await parseNumbersPage(url, page);
 };
 
-const parseNumbersPage = async (page: Page, target?: string, phones: PhoneNumber[] = []): Promise<PhoneNumber[]> => {
+const parseNumbersPage = async (url: string, page: Page, target?: string): Promise<PhoneNumberListReply> => {
+  await page.goto(url);
   consola.start(`parsing page ${page.url()}...`);
   await page.waitForSelector('section.container', { timeout: 5000 });
   const phoneNumberElementsLocator = 'div.row a';
-  const currentPagePhones = await page.$$eval(phoneNumberElementsLocator, (elements) =>
+  const phones = await page.$$eval(phoneNumberElementsLocator, (elements) =>
     elements.map((el) => ({ url: el?.href?.trim(), phone: el?.textContent?.trim()?.replace('+1', '') ?? '' }))
   );
-  phones.push(...currentPagePhones);
 
   if (target) {
     const phone = phones.find((phone) => phone.url.includes(target.replace('+', '')));
@@ -49,34 +45,43 @@ const parseNumbersPage = async (page: Page, target?: string, phones: PhoneNumber
       consola.info(`returning phone ${phone?.phone} with url ${phone?.url}`);
       await page.goto(phone.url);
       await page.waitForSelector('h1.title');
-      return [phone];
+      return { phones: [phone] };
     }
   }
+
   const paginationLocator = 'div.pagination > a';
   const links = await page.$$eval(paginationLocator, (elements) => elements.map((a) => a.href));
   const next = links.at(-1);
   if (!next || next === page.url()) {
-    return phones;
+    return { phones };
   }
-  await page.goto(next);
-  return await parseNumbersPage(page, target, phones);
+
+  return { phones, nextPageUrl: next };
 };
 
-const numberIsOnline = async (page: Page, country: Country, phoneNumber: string) => {
+const numberIsOnline = async (
+  page: Page,
+  country: Country,
+  phoneNumber: string,
+  pageUrl?: string
+): Promise<{ online: boolean; nextPageUrl?: string }> => {
   consola.info(`numberIsOnline, country: ${country}, phoneNumber: ${phoneNumber}`);
-  const url = getCountryUrl(country);
+  const url = pageUrl ?? getCountryUrl(country);
   consola.success(`got country url ${url}`);
 
   if (!url) {
-    return false;
+    return { online: false };
   }
-  await page.goto(url);
-  const [found] = await parseNumbersPage(page, phoneNumber);
+  const { phones, nextPageUrl } = await parseNumbersPage(url, page, phoneNumber);
+  const [found] = phones;
 
   const phoneMatch = found?.phone && found.phone === (country === 'USA' ? phoneNumber.replace('+1', '') : phoneNumber);
 
   if (!found.url || !phoneMatch) {
-    return false;
+    return {
+      online: false,
+      nextPageUrl
+    };
   }
 
   consola.success(`found url ${found.url}`);
@@ -86,7 +91,7 @@ const numberIsOnline = async (page: Page, country: Country, phoneNumber: string)
 
   const status = await page.$eval(`table.messagesTable`, (table) => !!table);
 
-  return status;
+  return { online: status };
 };
 
 const parseMessages = async (page: Page) => {
@@ -166,7 +171,16 @@ const recursivelyCheckMessages = async (
 export const handleSmsToMe = async (page: Page, options: OtpRouteHandlerOptions) => {
   consola.start(`starting automated check for otp`);
   consola.start(`checking number is online at ${baseUrl}`);
-  const isAlive = await numberIsOnline(page, options.country, options.phoneNumber);
+
+  const lookupStatus = async (url?: string): Promise<boolean> => {
+    const { online, nextPageUrl } = await numberIsOnline(page, options.country, options.phoneNumber, url);
+    if (!online && nextPageUrl) {
+      return await lookupStatus(nextPageUrl);
+    }
+    return online;
+  };
+
+  const isAlive = await lookupStatus();
 
   if (!isAlive) {
     throw new Error(`number ${options.phoneNumber} is not found or is offline`);

@@ -3,7 +3,7 @@ import { consola } from 'consola';
 import { tryParseOtpCode } from '../parseOtp.js';
 import { delay, parseTimeAgo, stringifyTriggerOtpTimeDiff } from '../../time/utils.js';
 import { countries, Countries } from './countries.js';
-import type { OtpRouteHandlerOptions, PhoneNumber } from '../types.js';
+import type { OtpRouteHandlerOptions, PhoneNumberListReply } from '../types.js';
 import { defaultRecheckDelay } from '../constants.js';
 import { Country } from '../providers.js';
 
@@ -156,45 +156,63 @@ export const handleReceiveSmsFreeCC = async (page: Page, options: OtpRouteHandle
   return match;
 };
 
-export const getReceiveSmsFreePhones = async (page: Page, country: Country): Promise<PhoneNumber[]> => {
+export const getReceiveSmsFreePhones = async (
+  page: Page,
+  country: Country,
+  nextUrl?: string
+): Promise<PhoneNumberListReply> => {
   consola.start(`starting parsing numbers for ${country}`);
-  const url = getCountryUrl(country);
+  const url = nextUrl ?? getCountryUrl(country);
 
   consola.success(`got url ${url}`);
 
   if (!url) {
-    return [];
+    return { phones: [] };
   }
 
-  await page.goto(url);
+  const { numbers, nextPageUrl } = await parseNumbersPage(page, url);
 
-  const numbers = await parseNumbersPage(page);
-
-  return numbers.map((phone) => ({ phone, url: getPhoneNumberUrl(country, phone) }));
+  return {
+    phones: numbers.map((phone) => ({ phone, url: getPhoneNumberUrl(country, phone) })),
+    nextPageUrl
+  };
 };
 
-const parseNumbersPage = async (page: Page, phones: string[] = []): Promise<string[]> => {
-  consola.start(`parsing page...`);
+const elementExist = async (page: Page, locator: string) => {
+  return (await page.$(locator).catch(() => null)) !== null;
+};
+
+const parseNumbersPage = async (page: Page, url: string): Promise<{ numbers: string[]; nextPageUrl?: string }> => {
+  await page.goto(url);
+  consola.start(`parsing page ${page.url()}...`);
   await page.waitForSelector('.section04 .index-title', { timeout: 5000 });
-  consola.success(`can see pagination element`);
+
   const phoneNumberElementsLocator = 'li a[href] > h2 > span';
   const currentPagePhones = await page.$$eval(phoneNumberElementsLocator, (elements) =>
     elements.map((el) => el?.textContent)
   );
 
-  const currentPhones = currentPagePhones
+  const numbers = currentPagePhones
     .filter((phone) => Boolean(phone))
-    .map((phone) => (phone as string).replace('+1 ', '').replaceAll(' ', ''));
+    .map((phone) => (phone as string).replace('+1', '').replaceAll(' ', ''));
 
-  phones.push(...currentPhones);
+  const paginationLocator = '.pagination > li.active + li a';
 
-  const nextPage = await page.$('.pagination > li.active + li');
+  const nextPageAvailable = await elementExist(page, paginationLocator);
 
-  if (nextPage) {
-    consola.info(`can see next page, visiting...`);
-    await nextPage.click();
-    return await parseNumbersPage(page, phones);
+  if (!nextPageAvailable) {
+    return { numbers };
+  }
+  consola.success(`can see pagination element`);
+
+  const nextPageUrl = await page.$eval(paginationLocator, (el) => el?.href);
+
+  if (nextPageUrl === url) {
+    return { numbers };
   }
 
-  return phones;
+  return {
+    numbers,
+    nextPageUrl
+  };
 };

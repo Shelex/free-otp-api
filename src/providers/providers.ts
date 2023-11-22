@@ -31,24 +31,28 @@ export const allowedCountries = Array.from(
 
 export const Sources: Record<Source, Provider> = {
   [Source.ReceiveSmsFree]: {
+    name: Source.ReceiveSmsFree,
     getPhonesList: getReceiveSmsFreePhones,
     handleOtp: handleReceiveSmsFreeCC,
     countries: receiveSmsFreeCountries,
     getCountryUrl: getReceiveSmsFreeCountryUrl
   },
   [Source.AnonymSms]: {
+    name: Source.AnonymSms,
     getPhonesList: getAnonymSmsPhones,
     handleOtp: handleAnonymSms,
     countries: anonymSmsCountries,
     getCountryUrl: getAnonymSmsCountryUrl
   },
   [Source.QuackrIo]: {
+    name: Source.QuackrIo,
     getPhonesList: getQuackrIoPhones,
     handleOtp: handleQuackrIo,
     countries: quackrIoCountries,
     getCountryUrl: getQuackrIoCountryUrl
   },
   [Source.SmsToMeCom]: {
+    name: Source.SmsToMeCom,
     getPhonesList: getSmsToMeComPhones,
     handleOtp: handleSmsToMe,
     countries: smsToMeComCountries,
@@ -56,7 +60,4 @@ export const Sources: Record<Source, Provider> = {
   }
 };
 
-export const providers = (Object.keys(Sources) as Source[]).map((source) => ({
-  name: source as Source,
-  ...Sources[source]
-}));
+export const providers = (Object.keys(Sources) as Source[]).map((source) => Sources[source]);

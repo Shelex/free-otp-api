@@ -23,6 +23,7 @@
     "@fastify/swagger": "8.12.0",
     "@fastify/swagger-ui": "1.10.1",
     "consola": "3.2.3",
+    "croner": "7.0.5",
     "dotenv": "16.3.1",
     "fastify": "4.24.3",
     "json-schema-to-ts": "2.9.2",
@@ -30,10 +31,12 @@
     "puppeteer-cluster": "0.23.0",
     "puppeteer-extra": "3.3.6",
     "puppeteer-extra-plugin-adblocker": "2.13.6",
-    "puppeteer-extra-plugin-stealth": "2.11.2"
+    "puppeteer-extra-plugin-stealth": "2.11.2",
+    "redis": "4.6.11"
   },
   "devDependencies": {
     "@types/node": "18.15.11",
+    "@types/redis": "4.0.11",
     "esbuild": "0.19.5",
     "eslint": "8.53.0",
     "eslint-config-prettier": "8.8.0",

@@ -1,7 +1,7 @@
 import { Page } from 'puppeteer';
 import { consola } from 'consola';
 import { Countries, countries } from './countries.js';
-import type { Message, OtpRouteHandlerOptions, PhoneNumber } from '../types.js';
+import type { Message, OtpRouteHandlerOptions, PhoneNumberListReply } from '../types.js';
 import { delay, parseTimeAgo, stringifyTriggerOtpTimeDiff } from '../../time/utils.js';
 import { tryParseOtpCode } from '../parseOtp.js';
 import { defaultRecheckDelay } from '../constants.js';
@@ -21,23 +21,26 @@ const getPhoneNumberUrl = (phone: string) => {
   return `${baseUrl}/number/${phone.replace('+', '')}/`;
 };
 
-export const getAnonymSmsPhones = async (page: Page, country: Country): Promise<PhoneNumber[]> => {
+export const getAnonymSmsPhones = async (page: Page, country: Country): Promise<PhoneNumberListReply> => {
   consola.start(`starting parsing numbers for ${country}`);
   const url = getCountryUrl(country);
 
   if (!url) {
-    return [];
+    return { phones: [] };
   }
 
   await page.goto(url);
 
   const numbers = await parseNumbersPage(page);
 
-  return numbers.map((phone) => ({ phone, url: getPhoneNumberUrl(phone) }));
+  return {
+    phones: numbers.map((phone) => ({ phone, url: getPhoneNumberUrl(phone) })),
+    nextPageUrl: ''
+  };
 };
 
 const parseNumbersPage = async (page: Page, phones: string[] = []): Promise<string[]> => {
-  consola.start(`parsing page...`);
+  consola.start(`parsing page ${page.url()}...`);
   await page.waitForSelector('.sms-group', { timeout: 5000 });
   const phoneNumberElementsLocator = '.sms-card__number > a';
   const currentPagePhones = await page.$$eval(phoneNumberElementsLocator, (elements) =>

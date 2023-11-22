@@ -1,7 +1,7 @@
 import { Page } from 'puppeteer';
 import { consola } from 'consola';
 import { Countries, countries } from './countries.js';
-import type { Message, OtpRouteHandlerOptions, PhoneNumber } from '../types.js';
+import type { Message, OtpRouteHandlerOptions, PhoneNumberListReply } from '../types.js';
 import { delay, parseTimeAgo, stringifyTriggerOtpTimeDiff } from '../../time/utils.js';
 import { tryParseOtpCode } from '../parseOtp.js';
 import { defaultRecheckDelay } from '../constants.js';
@@ -22,42 +22,54 @@ const getPhoneNumberUrl = (country: Country, phone: string) => {
   return `${getCountryUrl(country)}/${withCountryCode.replace('+', '')}`;
 };
 
-export const getQuackrIoPhones = async (page: Page, country: Country): Promise<PhoneNumber[]> => {
+export const getQuackrIoPhones = async (
+  page: Page,
+  country: Country,
+  nextUrl?: string
+): Promise<PhoneNumberListReply> => {
   consola.start(`starting parsing numbers for ${country}`);
-  const url = getCountryUrl(country);
+  const url = nextUrl ?? getCountryUrl(country);
 
   consola.success(`got url ${url}`);
 
   if (!url) {
-    return [];
+    return { phones: [] };
   }
 
-  await page.goto(url);
+  const { numbers } = await parseNumbersPage(url, page);
 
-  const numbers = await parseNumbersPage(page);
-
-  return numbers.map((phone) => ({ phone, url: getPhoneNumberUrl(country, phone) }));
+  return {
+    phones: numbers.map((phone) => ({ phone, url: getPhoneNumberUrl(country, phone) })),
+    nextPageUrl: ''
+  };
 };
 
-const parseNumbersPage = async (page: Page, phones: string[] = []): Promise<string[]> => {
-  consola.start(`parsing page...`);
-  await page.waitForSelector('country-page', { timeout: 5000 });
+const parseNumbersPage = async (url: string, page: Page): Promise<{ numbers: string[]; nextPageUrl?: string }> => {
+  await page.goto(url);
+  consola.start(`parsing page ${page.url()}`);
 
-  const availablePhonesLocator = '.columns.is-multiline:nth-child(4)';
-  await page.waitForSelector(availablePhonesLocator, { timeout: 5000 });
+  const getPhones = async (attempt = 1): Promise<string[]> => {
+    await page.waitForSelector('country-page section', { timeout: 5000 });
+    const availablePhonesLocator = '.columns.is-multiline:nth-child(4)';
+    const phoneNumberElementsLocator = `${availablePhonesLocator} p.title.is-5-small.mb-1 a`;
+    const phones = await page.$$eval(phoneNumberElementsLocator, (elements) =>
+      elements.map((el) => el?.textContent?.trim())
+    );
+    if (!phones.length && attempt <= 3) {
+      await delay(1.5);
+      return await getPhones(attempt + 1);
+    }
 
-  const phoneNumberElementsLocator = `${availablePhonesLocator} p.title.is-5-small.mb-1 a`;
-  const currentPagePhones = await page.$$eval(phoneNumberElementsLocator, (elements) =>
-    elements.map((el) => el?.textContent?.trim())
-  );
+    return phones as string[];
+  };
 
-  const currentPhones = currentPagePhones
+  const currentPagePhones = await getPhones();
+
+  const numbers = currentPagePhones
     .filter((phone) => Boolean(phone))
     .map((phone) => (phone as string).replace('+1', ''));
 
-  phones.push(...currentPhones);
-
-  return phones;
+  return { numbers };
 };
 
 const numberIsOnline = async (page: Page, country: Country, phoneNumber: string) => {
@@ -158,7 +170,7 @@ export const handleQuackrIo = async (page: Page, options: OtpRouteHandlerOptions
 
   consola.success(`number ${options.phoneNumber} is online`);
 
-  await delay(3);
+  await delay(1.5);
   const match = await recursivelyCheckMessages(
     page,
     options.askedOtpAt || 0,
