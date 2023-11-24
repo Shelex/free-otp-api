@@ -24,6 +24,14 @@ export interface PhoneRecord {
   source: string;
 }
 
+export interface PhoneRecordCard {
+  value: string;
+  sources: {
+    name: string;
+    url: string;
+  }[];
+}
+
 export interface Message {
   ago: number;
   agoText: string;

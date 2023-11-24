@@ -1,10 +1,12 @@
 import { Flex, Pagination } from 'antd';
 import { useCallback, useState } from 'react';
-import { PhoneRecord } from '../../../types';
+import { PhoneRecord, PhoneRecordCard } from '../../../types';
 import PhoneCard from './PhoneCard';
-import { uniqueId } from 'lodash';
+import { uniqBy, uniqueId } from 'lodash';
+import { transformPhoneRecords } from './helpers';
 
 interface Props {
+  tabName?: string;
   phones: PhoneRecord[];
   country: string;
   loading: boolean;
@@ -14,7 +16,7 @@ interface Props {
 const PAGE_SIZE_OPTIONS = [20, 40, 80, 120];
 const DEFAULT_PAGE_SIZE = PAGE_SIZE_OPTIONS.at(1) ?? 40;
 
-const PhonesTab: React.FC<Props> = ({ phones, country, loading, headerHeight }) => {
+const PhonesTab: React.FC<Props> = ({ phones, country, loading, headerHeight, tabName }) => {
   const [showPhones, setShowPhones] = useState<PhoneRecord[]>([]);
   const [paginationInfo, setPaginationInfo] = useState({ current: 1, pageSize: DEFAULT_PAGE_SIZE });
 
@@ -35,14 +37,15 @@ const PhonesTab: React.FC<Props> = ({ phones, country, loading, headerHeight }) 
     if (loading) {
       return Array.from({ length: 24 });
     }
-    return showPhones.length ? showPhones : phones.slice(0, paginationInfo.pageSize);
+    const phonesPerPage = showPhones.length ? showPhones : phones.slice(0, paginationInfo.pageSize);
+    return transformPhoneRecords(phonesPerPage);
   }, [loading, paginationInfo, phones, showPhones]);
 
   return (
     <>
       {phones.length ? (
         <Pagination
-          total={phones.length}
+          total={uniqBy(phones, 'value').length}
           showTotal={(total, range) => `${range[0]}-${range[1]} of ${total} phone numbers`}
           defaultPageSize={DEFAULT_PAGE_SIZE}
           defaultCurrent={1}
@@ -61,7 +64,7 @@ const PhonesTab: React.FC<Props> = ({ phones, country, loading, headerHeight }) 
       ) : null}
       <Flex justify="center" wrap="wrap" gap="large">
         {getCardRecords()?.map((phone) => (
-          <PhoneCard key={uniqueId()} phone={phone as PhoneRecord} loading={loading} countryName={country} />
+          <PhoneCard key={uniqueId()} phone={phone as PhoneRecordCard} loading={loading} countryName={country} />
         ))}
       </Flex>
     </>

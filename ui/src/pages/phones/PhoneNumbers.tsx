@@ -6,9 +6,7 @@ import { baseUrl, endpoints } from '../../api';
 import { PhoneRecord, PhonesResponse } from '../../types';
 import { uniq } from 'lodash';
 import PhonesTab from './components/PhonesTab';
-
-const HEADER_HEIGHT = 64;
-const ALL_SOURCES_TAB = 'all';
+import { ALL_SOURCES_TAB, HEADER_HEIGHT } from './constants';
 
 const filterBySource = (phones: PhoneRecord[], selectedSource: string) =>
   phones.filter((phone) => (selectedSource !== ALL_SOURCES_TAB ? phone.source === selectedSource : phone));
@@ -49,6 +47,7 @@ const PhoneNumbers: React.FC = () => {
       key: `${index}`,
       children: (
         <PhonesTab
+          tabName={source}
           phones={filterBySource(phones, source)}
           country={country}
           loading={loading || isFetching.current}
