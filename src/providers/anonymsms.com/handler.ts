@@ -3,7 +3,7 @@ import { consola } from 'consola';
 import { Countries, countries } from './countries.js';
 import type { Message, OtpRouteHandlerOptions, PhoneNumberListReply } from '../types.js';
 import { delay, parseTimeAgo, stringifyTriggerOtpTimeDiff } from '../../time/utils.js';
-import { tryParseOtpCode } from '../parseOtp.js';
+import { tryParseOtpCode } from '../helpers.js';
 import { defaultRecheckDelay } from '../constants.js';
 import { Country } from '../providers.js';
 

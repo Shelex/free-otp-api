@@ -24,10 +24,12 @@ export enum IsoCode {
   Italy = 'IT',
   Japan = 'JP',
   Kazakhstan = 'KZ',
+  Kenya = 'KE',
   SouthKorea = 'KR',
   Latvia = 'LV',
   Macao = 'MO',
   Malaysia = 'MY',
+  Mauritius = 'MU',
   Mexico = 'MX',
   Moldova = 'MD',
   Morocco = 'MA',
@@ -39,6 +41,7 @@ export enum IsoCode {
   Philippines = 'PH',
   Poland = 'PL',
   Portugal = 'PT',
+  PuertoRico = 'PR',
   Romania = 'RO',
   Serbia = 'RS',
   SouthAfrica = 'ZA',
@@ -49,6 +52,7 @@ export enum IsoCode {
   TimorLeste = 'TL',
   Pakistan = 'PK',
   Ukraine = 'UA',
+  Uzbekistan = 'UZ',
   Vietnam = 'VN',
   Unknown = 'N/A'
 }

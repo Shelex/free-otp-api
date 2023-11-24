@@ -11,22 +11,35 @@ import {
 import { handleQuackrIo, getQuackrIoPhones, getCountryUrl as getQuackrIoCountryUrl } from './quackr.io/handler.js';
 import { handleSmsToMe, getSmsToMeComPhones, getCountryUrl as getSmsToMeCountryUrl } from './smstome.com/handler.js';
 import {
+  handleReceiveSmsCo,
+  getReceiveSmsCoPhones,
+  getCountryUrl as getReceiveSmsCoCountryUrl
+} from './receivesms.co/handler.js';
+import {
   countries as receiveSmsFreeCountries,
   Countries as ReceiveSmsFreeCounties
 } from './receive-sms-free.cc/countries.js';
 import { countries as anonymSmsCountries, Countries as AnonymSmsCountries } from './anonymsms.com/countries.js';
 import { countries as quackrIoCountries, Countries as QuackrIoCountries } from './quackr.io/countries.js';
 import { countries as smsToMeComCountries, Countries as SmsToMeComCountries } from './smstome.com/countries.js';
+import { countries as receiveSmsCoCountries, Countries as ReceiveSmsCoCountries } from './receivesms.co/countries.js';
 import { Provider, Source } from './types.js';
 
 export type Country =
   | keyof typeof ReceiveSmsFreeCounties
   | keyof typeof AnonymSmsCountries
   | keyof typeof QuackrIoCountries
-  | keyof typeof SmsToMeComCountries;
+  | keyof typeof SmsToMeComCountries
+  | keyof typeof ReceiveSmsCoCountries;
 
 export const allowedCountries = Array.from(
-  new Set([...receiveSmsFreeCountries, ...anonymSmsCountries, ...quackrIoCountries, ...smsToMeComCountries])
+  new Set([
+    ...receiveSmsFreeCountries,
+    ...anonymSmsCountries,
+    ...quackrIoCountries,
+    ...smsToMeComCountries,
+    ...receiveSmsCoCountries
+  ])
 );
 
 export const Sources: Record<Source, Provider> = {
@@ -57,6 +70,13 @@ export const Sources: Record<Source, Provider> = {
     handleOtp: handleSmsToMe,
     countries: smsToMeComCountries,
     getCountryUrl: getSmsToMeCountryUrl
+  },
+  [Source.ReceiveSmsCo]: {
+    name: Source.ReceiveSmsCo,
+    getPhonesList: getReceiveSmsCoPhones,
+    handleOtp: handleReceiveSmsCo,
+    countries: receiveSmsCoCountries,
+    getCountryUrl: getReceiveSmsCoCountryUrl
   }
 };
 

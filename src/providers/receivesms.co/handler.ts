@@ -7,17 +7,17 @@ import { tryParseOtpCode } from '../helpers.js';
 import { defaultRecheckDelay } from '../constants.js';
 import { Country } from '../providers.js';
 
-const baseUrl = 'https://smstome.com';
+const baseUrl = 'https://www.receivesms.co';
 
 export const getCountryUrl = (country: Country) => {
   if (!countries.includes(country)) {
     return '';
   }
 
-  return `${baseUrl}/country/${Countries[country as keyof typeof Countries]}`;
+  return `${baseUrl}/${Countries[country as keyof typeof Countries]}/`;
 };
 
-export const getSmsToMeComPhones = async (page: Page, country: Country, nextUrl?: string) => {
+export const getReceiveSmsCoPhones = async (page: Page, country: Country, nextUrl?: string) => {
   consola.start(`starting parsing numbers for ${country}`);
   const url = nextUrl ?? getCountryUrl(country);
 
@@ -33,30 +33,48 @@ export const getSmsToMeComPhones = async (page: Page, country: Country, nextUrl?
 const parseNumbersPage = async (url: string, page: Page, target?: string): Promise<PhoneNumberListReply> => {
   await page.goto(url);
   consola.start(`parsing page ${page.url()}...`);
-  await page.waitForSelector('section.container', { timeout: 5000 });
-  const phoneNumberElementsLocator = 'div.row a';
-  const phones = await page.$$eval(phoneNumberElementsLocator, (elements) =>
-    elements.map((el) => ({ url: el?.href?.trim(), phone: el?.textContent?.trim()?.replace('+1', '') ?? '' }))
+  await page.waitForSelector('nav ul', { timeout: 5000 });
+  const phoneNumberRowsLocator = '.row table tbody tr';
+
+  const phones = await page.$$eval(phoneNumberRowsLocator, (rows) =>
+    rows.map((row) => {
+      const rowChildren = Array.from(row.children);
+      const [, , phone, , link] = rowChildren;
+      return {
+        phone: phone?.textContent?.trim()?.replace('+1', '') ?? '',
+        url: link?.querySelector('a')?.href?.trim()?.replace('receivesms.org', 'receivesms.co') ?? ''
+      };
+    })
   );
 
   if (target) {
-    const phone = phones.find((phone) => phone.url.includes(target.replace('+', '')));
+    const phone = phones.find((item) => item.phone === target.replace('+1', '').replace('+', ''));
     if (phone?.url) {
       consola.info(`returning phone ${phone?.phone} with url ${phone?.url}`);
       await page.goto(phone.url);
-      await page.waitForSelector('h1.title');
+      await page.waitForSelector('div button b');
       return { phones: [phone] };
     }
+
+    return { phones: [] };
   }
 
-  const paginationLocator = 'div.pagination > a';
+  const paginationLocator = 'nav ul.pagination li a';
   const links = await page.$$eval(paginationLocator, (elements) => elements.map((a) => a.href));
-  const next = links.at(-1);
-  if (!next || next === page.url()) {
-    return { phones };
+
+  const linkIsNotNextPage = (link?: string) => !link || link === page.url() || link === '#';
+
+  if (links.length > 3) {
+    const nextPageUrl = links.at(-2);
+
+    if (linkIsNotNextPage(nextPageUrl)) {
+      return { phones };
+    }
+
+    return { phones, nextPageUrl };
   }
 
-  return { phones, nextPageUrl: next };
+  return { phones };
 };
 
 const numberIsOnline = async (
@@ -75,7 +93,7 @@ const numberIsOnline = async (
   const { phones, nextPageUrl } = await parseNumbersPage(url, page, phoneNumber);
   const [found] = phones;
 
-  const phoneMatch = found?.phone && found.phone === (country === 'USA' ? phoneNumber.replace('+1', '') : phoneNumber);
+  const phoneMatch = found.phone === (country === 'USA' ? phoneNumber.replace('+1', '') : phoneNumber.replace('+', ''));
 
   if (!found.url || !phoneMatch) {
     return {
@@ -87,15 +105,15 @@ const numberIsOnline = async (
   consola.success(`found url ${found.url}`);
   await page.goto(found.url);
 
-  await page.waitForSelector('h1.title');
+  await page.waitForSelector('div button b');
 
-  const status = await page.$eval(`table.messagesTable`, (table) => !!table);
+  const status = await page.$eval(`div#msgtbl`, (table) => !!table);
 
   return { online: status };
 };
 
 const parseMessages = async (page: Page) => {
-  const rowLocator = 'table.messagesTable tr';
+  const rowLocator = 'div#msgtbl > div';
 
   const messageRows = (await page.$$eval(rowLocator, (rows) => rows.map((row) => row.textContent))) as string[];
 
@@ -103,12 +121,15 @@ const parseMessages = async (page: Page) => {
 
   return unparsedRows
     .map((row) => {
-      const [, ago, ...messages] = row.map((td) => td?.trim());
-      const agoParsed = parseTimeAgo(ago);
+      const [sender, ago, ...messages] = row.map((td) => td?.trim());
+
+      const isGoogleAds = sender === 'ADSFrom Google Ads';
+      const sanitizedAgo = ago.replace(' ', '').replace('ago', ' ago').trim();
+      const agoParsed = parseTimeAgo(sanitizedAgo);
 
       return {
-        ago: agoParsed,
-        agoText: ago,
+        ago: isGoogleAds ? 0 : agoParsed,
+        agoText: sanitizedAgo,
         message: messages.join(' ')
       } as Message;
     })
@@ -155,9 +176,9 @@ const recursivelyCheckMessages = async (
     }, will try after ${recheckDelay}s...`
   );
 
-  const buttons = await page.$$('section.container > button');
+  const updateButton = await page.$('div button b');
 
-  await buttons.at(0)?.click();
+  await updateButton?.click();
 
   const currentUrl = page.url();
   if (!currentUrl.includes(baseUrl)) {
@@ -168,7 +189,7 @@ const recursivelyCheckMessages = async (
   return recursivelyCheckMessages(page, askedAt, matcher, recheckDelay);
 };
 
-export const handleSmsToMe = async (page: Page, options: OtpRouteHandlerOptions) => {
+export const handleReceiveSmsCo = async (page: Page, options: OtpRouteHandlerOptions) => {
   consola.start(`starting automated check for otp`);
   consola.start(`checking number is online at ${baseUrl}`);
 

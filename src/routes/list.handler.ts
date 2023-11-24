@@ -4,6 +4,7 @@ import { browser } from '../browser/cluster.js';
 import { consola } from 'consola';
 import { Country, PhoneNumber, PhoneNumberListReply, Source, providers } from '../providers/index.js';
 import { getPhones, savePhones } from '../repository/redis.js';
+import { filterUniquePhones } from '../providers/helpers.js';
 
 export const listPhonesHandler: RouteHandler<{
   Params: ListParams;
@@ -58,7 +59,7 @@ export const listPhonesHandler: RouteHandler<{
             return await getPhonesList(allPhones, result.nextPageUrl);
           }
 
-          return allPhones;
+          return filterUniquePhones(allPhones);
         };
 
         const result = alreadyStored.length ? alreadyStored : await getPhonesList();

@@ -1,6 +1,6 @@
 import { Page } from 'puppeteer';
 import { consola } from 'consola';
-import { tryParseOtpCode } from '../parseOtp.js';
+import { tryParseOtpCode } from '../helpers.js';
 import { delay, parseTimeAgo, stringifyTriggerOtpTimeDiff } from '../../time/utils.js';
 import { countries, Countries } from './countries.js';
 import type { OtpRouteHandlerOptions, PhoneNumberListReply } from '../types.js';

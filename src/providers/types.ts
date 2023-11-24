@@ -5,7 +5,8 @@ export enum Source {
   ReceiveSmsFree = 'receive-sms-free.cc',
   AnonymSms = 'anonymsms.com',
   QuackrIo = 'quackr.io',
-  SmsToMeCom = 'smstome.com'
+  SmsToMeCom = 'smstome.com',
+  ReceiveSmsCo = 'receivesms.co'
 }
 
 export interface Provider {
