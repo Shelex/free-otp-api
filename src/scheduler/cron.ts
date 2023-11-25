@@ -3,6 +3,7 @@ import { Country, Provider, providers } from '../providers/index.js';
 import { getPhonesListTask } from '../providers/getPhonesListTask.js';
 import { consola } from 'consola';
 import { savePhones } from '../repository/redis.js';
+import { filterUniquePhones } from '../providers/helpers.js';
 
 const cacheCountryPhones = async (provider: Provider, country: Country) => {
   try {
@@ -20,7 +21,7 @@ const lookupPhoneNumbers = async () => {
     for (const country of provider.countries) {
       consola.info(`checking country ${country} for ${provider.name}`);
       const phones = await cacheCountryPhones(provider, country);
-      await savePhones(provider.name, country, phones ?? []);
+      await savePhones(provider.name, country, filterUniquePhones(phones) ?? []);
     }
   }
 };
