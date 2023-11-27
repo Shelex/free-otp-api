@@ -19,7 +19,7 @@ const CountryCard: React.FC<Props> = ({ country, loading }) => {
     <Card
       loading={loading}
       hoverable
-      style={{ width: 240, height: 320, background: '#f5f5f5' }}
+      style={{ width: 240, height: 360, background: '#f5f5f5' }}
       title={
         <Typography.Title style={{ border: 'none' }} level={5}>
           {country?.name}

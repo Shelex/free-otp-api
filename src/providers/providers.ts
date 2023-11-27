@@ -4,6 +4,11 @@ import {
   getCountryUrl as getReceiveSmsFreeCountryUrl
 } from './receive-sms-free.cc/handler.js';
 import {
+  handleTempNumberCom,
+  getTempNumberComPhones,
+  getCountryUrl as getTempNumberComCountryUrl
+} from './temp-number.com/handler.js';
+import {
   handleAnonymSms,
   getAnonymSmsPhones,
   getCountryUrl as getAnonymSmsCountryUrl
@@ -19,6 +24,7 @@ import {
   countries as receiveSmsFreeCountries,
   Countries as ReceiveSmsFreeCounties
 } from './receive-sms-free.cc/countries.js';
+import { countries as tempNumberCountries, Countries as TempNumberCountries } from './temp-number.com/countries.js';
 import { countries as anonymSmsCountries, Countries as AnonymSmsCountries } from './anonymsms.com/countries.js';
 import { countries as quackrIoCountries, Countries as QuackrIoCountries } from './quackr.io/countries.js';
 import { countries as smsToMeComCountries, Countries as SmsToMeComCountries } from './smstome.com/countries.js';
@@ -27,6 +33,7 @@ import { Provider, Source } from './types.js';
 
 export type Country =
   | keyof typeof ReceiveSmsFreeCounties
+  | keyof typeof TempNumberCountries
   | keyof typeof AnonymSmsCountries
   | keyof typeof QuackrIoCountries
   | keyof typeof SmsToMeComCountries
@@ -35,6 +42,7 @@ export type Country =
 export const allowedCountries = Array.from(
   new Set([
     ...receiveSmsFreeCountries,
+    ...tempNumberCountries,
     ...anonymSmsCountries,
     ...quackrIoCountries,
     ...smsToMeComCountries,
@@ -77,6 +85,13 @@ export const Sources: Record<Source, Provider> = {
     handleOtp: handleReceiveSmsCo,
     countries: receiveSmsCoCountries,
     getCountryUrl: getReceiveSmsCoCountryUrl
+  },
+  [Source.TempNumberCom]: {
+    name: Source.TempNumberCom,
+    getPhonesList: getTempNumberComPhones,
+    handleOtp: handleTempNumberCom,
+    countries: tempNumberCountries,
+    getCountryUrl: getTempNumberComCountryUrl
   }
 };
 

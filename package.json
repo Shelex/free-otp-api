@@ -37,11 +37,11 @@
   "devDependencies": {
     "@types/node": "18.15.11",
     "@types/redis": "4.0.11",
-    "esbuild": "0.19.5",
-    "eslint": "8.53.0",
+    "esbuild": "0.19.8",
+    "eslint": "8.54.0",
     "eslint-config-prettier": "8.8.0",
     "eslint-plugin-prettier": "4.2.1",
     "prettier": "2.8.8",
-    "typescript": "5.2.2"
+    "typescript": "5.3.2"
   }
 }

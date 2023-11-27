@@ -11,7 +11,7 @@ export const waitFor = async (condition: () => boolean) => {
   return condition();
 };
 
-type TimeUnit = 's' | 'm' | 'h' | 'd';
+type TimeUnit = 's' | 'm' | 'h' | 'd' | 'w';
 
 export const parseTimeAgo = (timeAgo: string): number => {
   const relativeTimeString = !timeAgo.includes('ago') ? `${timeAgo} ago` : timeAgo;
@@ -20,10 +20,11 @@ export const parseTimeAgo = (timeAgo: string): number => {
     s: 1000,
     m: 1000 * 60,
     h: 1000 * 60 * 60,
-    d: 1000 * 60 * 60 * 24
+    d: 1000 * 60 * 60 * 24,
+    w: 1000 * 60 * 60 * 24 * 7
   };
 
-  const timeRegex = /.*?(\d+)\s?([smhd]).*?ago/i;
+  const timeRegex = /.*?(\d+)\s?([smhdw]).*?ago/i;
   const match = relativeTimeString.match(timeRegex);
 
   if (!match) {

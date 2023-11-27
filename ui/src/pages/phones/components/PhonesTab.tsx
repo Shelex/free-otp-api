@@ -44,15 +44,9 @@ const PhonesTab: React.FC<Props> = ({ phones, country, loading, headerHeight, ta
   return (
     <>
       {phones.length ? (
-        <Pagination
-          total={uniqBy(phones, 'value').length}
-          showTotal={(total, range) => `${range[0]}-${range[1]} of ${total} phone numbers`}
-          defaultPageSize={DEFAULT_PAGE_SIZE}
-          defaultCurrent={1}
-          pageSizeOptions={PAGE_SIZE_OPTIONS}
-          {...paginationInfo}
-          disabled={loading}
-          onChange={onSetPage}
+        <Flex
+          justify="center"
+          gap="large"
           style={{
             padding: 3,
             position: 'sticky',
@@ -60,7 +54,21 @@ const PhonesTab: React.FC<Props> = ({ phones, country, loading, headerHeight, ta
             backgroundColor: 'InfoBackground',
             zIndex: 1
           }}
-        />
+        >
+          <Pagination
+            total={uniqBy(phones, 'value').length}
+            showTotal={(total, range) => `${range[0]}-${range[1]} of ${total} phone numbers`}
+            defaultPageSize={DEFAULT_PAGE_SIZE}
+            defaultCurrent={1}
+            pageSizeOptions={PAGE_SIZE_OPTIONS}
+            {...paginationInfo}
+            disabled={loading}
+            onChange={onSetPage}
+            style={{
+              width: '100%'
+            }}
+          />
+        </Flex>
       ) : null}
       <Flex justify="center" wrap="wrap" gap="large">
         {getCardRecords()?.map((phone) => (
