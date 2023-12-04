@@ -14,22 +14,24 @@ const cacheCountryPhones = async (provider: Provider, country: Country) => {
   }
 };
 
-const lookupPhoneNumbers = async () => {
-  consola.info(`starting PhoneNumbers lookup`);
-  for (const provider of providers) {
-    consola.info(`checking countries for ${provider.name}`);
-    for (const country of provider.countries) {
-      consola.info(`checking country ${country} for ${provider.name}`);
-      const phones = await cacheCountryPhones(provider, country);
-      await savePhones(provider.name, country, filterUniquePhones(phones) ?? []);
-    }
+const lookupPhoneNumbers = async (provider: Provider) => {
+  consola.info(`checking countries for ${provider.name}`);
+  for (const country of provider.countries) {
+    consola.info(`checking country ${country} for ${provider.name}`);
+    const phones = await cacheCountryPhones(provider, country);
+    await savePhones(provider.name, country, filterUniquePhones(phones) ?? []);
   }
 };
 
-//At minute 30 past every 10th hour
-export const cachePhoneNumbersJob = Cron('30 */10 * * *', { catch: true, unref: true, paused: true }, async () => {
-  consola.success(`starting job`);
-  await lookupPhoneNumbers();
-});
+export const createJob = (provider: Provider, scheduleExpression: string) =>
+  Cron(scheduleExpression, { catch: true, unref: true, paused: true }, async () => {
+    consola.success(`starting job`);
+    await lookupPhoneNumbers(provider);
+  });
 
-consola.info(`[cache-job] next 10 runs: ${JSON.stringify(cachePhoneNumbersJob.nextRuns(10), null, 2)}`);
+export const jobs = providers.reduce((jobs, provider) => {
+  const job = createJob(provider, provider.refreshCacheExpression ?? '30 */10 * * *');
+  jobs[provider.name] = job;
+  consola.info(`[cache-job] created for ${provider.name}, next runs: ${JSON.stringify(job.nextRuns(10), null, 2)}`);
+  return jobs;
+}, {} as Record<Provider['name'], Cron>);

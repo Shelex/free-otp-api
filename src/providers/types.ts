@@ -16,6 +16,7 @@ export interface Provider {
   handleOtp: (page: Page, options: OtpRouteHandlerOptions) => Promise<Message | Message[] | undefined>;
   countries: Country[];
   getCountryUrl: (country: Country) => string;
+  refreshCacheExpression?: string;
 }
 
 export interface OtpRouteHandlerOptions {

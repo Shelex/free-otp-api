@@ -53,28 +53,24 @@ export interface Message {
 
 const parseMessages = async (page: Page) => {
   const currentUrl = page.url();
+  const rowLocator = '.casetext > .row';
 
-  const rowLocator = currentUrl.includes(baseUrl) ? 'div.casetext div.row' : 'div#msgtbl div.row';
+  const messageRows = await page.$$eval(rowLocator, (rows) =>
+    rows.map((row) => ({
+      ago: row.children[1]?.textContent ?? '',
+      message: row.children[2]?.textContent ?? ''
+    }))
+  );
 
-  const messageRows = (await page.$$eval(rowLocator, (rows) => rows.map((row) => row.textContent))) as string[];
-
-  const unparsedRows = messageRows.map((row) => row.split('\n').filter((x) => x));
-
-  const findAgoLine = (row: string[]) => row.findIndex((el) => el.includes('ago'));
-
-  return unparsedRows
-    .filter((row) => findAgoLine(row) !== -1)
+  return messageRows
+    .filter((row) => row.ago.length && row.message.length)
     .map((row) => {
-      row.reverse(); // to get last 2 elements (ago and message) at first
-      const agoIndex = findAgoLine(row);
-      const remainingFields = row.slice(0, agoIndex).reverse().join(' ');
-      const ago = row[agoIndex];
-      const agoParsed = parseTimeAgo(ago);
+      const agoParsed = parseTimeAgo(row.ago);
 
       return {
         ago: agoParsed,
-        agoText: ago,
-        message: remainingFields,
+        agoText: row.ago,
+        message: row.message,
         url: currentUrl
       } as Message;
     })

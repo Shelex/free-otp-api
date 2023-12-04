@@ -5,7 +5,7 @@ import { setGracefulShutdown } from './gracefulShutdown.js';
 import swagger from './plugins/swagger.js';
 import cors from './plugins/cors.js';
 import routes from './routes/index.js';
-import { cachePhoneNumbersJob } from './scheduler/cron.js';
+import { jobs } from './scheduler/cron.js';
 
 dotenv.config();
 
@@ -21,7 +21,8 @@ setInterval(async () => {
 
 setGracefulShutdown();
 
-cachePhoneNumbersJob.resume();
+// resume all jobs when app initialized
+Object.values(jobs).map((job) => job.resume());
 
 app.listen({ port: parseInt(process.env.PORT ?? '') || 3030 }, (err) => {
   if (err) throw err;
