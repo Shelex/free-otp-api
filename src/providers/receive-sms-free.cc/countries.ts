@@ -22,7 +22,7 @@ export enum Countries {
   //Israel = 'Israel',
   //Italy = 'Italy',
   //Japan = 'Japan',
-  Kazakhstan = 'Kazakhstan',
+  //Kazakhstan = 'Kazakhstan',
   //SouthKorea = 'Korea',
   Latvia = 'Latvia',
   //Macao = 'Macao',
@@ -35,18 +35,19 @@ export enum Countries {
   //NewZealand = 'NewZealand',
   //Nigeria = 'Nigeria',
   //Norway = 'Norway',
-  Philippines = 'Philippines',
+  //Philippines = 'Philippines',
   Poland = 'Poland',
   Portugal = 'Portugal',
-  Romania = 'Romania',
+  //Romania = 'Romania',
+  Terroruzzia = 'Russia',
   //Serbia = 'Serbia',
   //SouthAfrica = 'SouthAfrica',
   Spain = 'Spain',
-  Sweden = 'Sweden',
+  Sweden = 'Sweden'
   //Switzerland = 'Switzerland',
   //Thailand = 'Thailand',
   //TimorLeste = 'TimorLeste',
-  Ukraine = 'Ukraine'
+  //Ukraine = 'Ukraine'
   //Vietnam = 'Vietnam'
 }
 

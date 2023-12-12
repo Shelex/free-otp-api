@@ -22,7 +22,7 @@ const getPhoneNumberUrl = (phone: string) => {
 };
 
 export const getAnonymSmsPhones = async (page: Page, country: Country): Promise<PhoneNumberListReply> => {
-  consola.start(`starting parsing numbers for ${country}`);
+  consola.start(`starting parsing numbers for ${country.toString()}`);
   const url = getCountryUrl(country);
 
   if (!url) {

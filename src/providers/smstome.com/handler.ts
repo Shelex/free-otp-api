@@ -18,7 +18,7 @@ export const getCountryUrl = (country: Country) => {
 };
 
 export const getSmsToMeComPhones = async (page: Page, country: Country, nextUrl?: string) => {
-  consola.start(`starting parsing numbers for ${country}`);
+  consola.start(`starting parsing numbers for ${country.toString()}`);
   const url = nextUrl ?? getCountryUrl(country);
 
   consola.success(`got url ${url}`);
@@ -65,7 +65,7 @@ const numberIsOnline = async (
   phoneNumber: string,
   pageUrl?: string
 ): Promise<{ online: boolean; nextPageUrl?: string }> => {
-  consola.info(`numberIsOnline, country: ${country}, phoneNumber: ${phoneNumber}`);
+  consola.info(`numberIsOnline, country: ${country.toString()}, phoneNumber: ${phoneNumber}`);
   const url = pageUrl ?? getCountryUrl(country);
   consola.success(`got country url ${url}`);
 
@@ -97,13 +97,13 @@ const numberIsOnline = async (
 const parseMessages = async (page: Page) => {
   const rowLocator = 'table.messagesTable tr';
 
-  const messageRows = (await page.$$eval(rowLocator, (rows) => rows.map((row) => row.textContent))) as string[];
+  const messageRows = await page.$$eval(rowLocator, (rows) =>
+    rows.map((row) => Array.from(row.querySelectorAll('td')).map((td) => td?.textContent?.trim()))
+  );
 
-  const unparsedRows = messageRows.map((row) => row.split('\n').filter((x) => x?.trim()));
-
-  return unparsedRows
+  return messageRows
     .map((row) => {
-      const [, ago, ...messages] = row.map((td) => td?.trim());
+      const [, ago, ...messages] = row;
       const agoParsed = parseTimeAgo(ago);
 
       return {
@@ -121,7 +121,7 @@ const recursivelyCheckMessages = async (
   matcher: string | string[],
   recheckDelay: number
 ): Promise<Message | Message[]> => {
-  await page.waitForNetworkIdle({ idleTime: 500 });
+  await page.waitForNetworkIdle({ idleTime: 2500 });
 
   const parsed = (await parseMessages(page)) || [];
   if (!parsed.length) {

@@ -50,7 +50,7 @@ const PhonesTab: React.FC<Props> = ({ phones, country, loading, headerHeight, ta
           style={{
             padding: 3,
             position: 'sticky',
-            top: headerHeight + 57,
+            top: headerHeight + 46,
             backgroundColor: 'InfoBackground',
             zIndex: 1
           }}

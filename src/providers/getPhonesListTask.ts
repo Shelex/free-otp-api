@@ -39,7 +39,7 @@ export const getPhonesListTask = async (country: Country, provider: Provider): P
 
     return result ?? [];
   } catch (e) {
-    consola.warn(`failed to fetch phones for ${provider.name} in ${country}, will retry`);
+    consola.warn(`failed to fetch phones for ${provider.name} in ${country.toString()}, will retry`);
     await delay(10);
     consola.warn(e);
     return await getPhonesListTask(country, provider);

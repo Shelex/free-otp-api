@@ -17,9 +17,9 @@ const cacheCountryPhones = async (provider: Provider, country: Country) => {
 const lookupPhoneNumbers = async (provider: Provider) => {
   consola.info(`checking countries for ${provider.name}`);
   for (const country of provider.countries) {
-    consola.info(`checking country ${country} for ${provider.name}`);
+    consola.info(`checking country ${country.toString()} for ${provider.name}`);
     const phones = await cacheCountryPhones(provider, country);
-    await savePhones(provider.name, country, filterUniquePhones(phones) ?? []);
+    await savePhones(provider.name, country.toString(), filterUniquePhones(phones) ?? []);
   }
 };
 

@@ -18,7 +18,7 @@ export const getCountryUrl = (country: Country) => {
 };
 
 export const getReceiveSmsCoPhones = async (page: Page, country: Country, nextUrl?: string) => {
-  consola.start(`starting parsing numbers for ${country}`);
+  consola.start(`starting parsing numbers for ${country.toString()}`);
   const url = nextUrl ?? getCountryUrl(country);
 
   consola.success(`got url ${url}`);
@@ -48,7 +48,7 @@ const parseNumbersPage = async (url: string, page: Page, target?: string): Promi
   );
 
   if (target) {
-    const phone = phones.find((item) => item.phone === target.replace('+1', '').replace('+', ''));
+    const phone = phones.find((item) => item.phone === target.replace('+1', ''));
     if (phone?.url) {
       consola.info(`returning phone ${phone?.phone} with url ${phone?.url}`);
       await page.goto(phone.url);
@@ -83,7 +83,7 @@ const numberIsOnline = async (
   phoneNumber: string,
   pageUrl?: string
 ): Promise<{ online: boolean; nextPageUrl?: string }> => {
-  consola.info(`numberIsOnline, country: ${country}, phoneNumber: ${phoneNumber}`);
+  consola.info(`numberIsOnline, country: ${country.toString()}, phoneNumber: ${phoneNumber}`);
   const url = pageUrl ?? getCountryUrl(country);
   consola.success(`got country url ${url}`);
 

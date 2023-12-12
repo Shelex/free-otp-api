@@ -28,6 +28,7 @@ export enum Countries {
   //Norway = 'norway',
   Pakistan = 'pakistan',
   Poland = 'poland',
+  Terroruzzia = 'russia',
   SouthAfrica = 'south-africa',
   Spain = 'spain',
   Sweden = 'sweden',

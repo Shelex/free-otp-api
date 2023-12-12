@@ -52,6 +52,7 @@ export enum IsoCode {
   Switzerland = 'CH',
   Thailand = 'TH',
   TimorLeste = 'TL',
+  Terroruzzia = 'XX',
   Pakistan = 'PK',
   Ukraine = 'UA',
   Uzbekistan = 'UZ',

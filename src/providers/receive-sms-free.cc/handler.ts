@@ -157,7 +157,7 @@ export const getReceiveSmsFreePhones = async (
   country: Country,
   nextUrl?: string
 ): Promise<PhoneNumberListReply> => {
-  consola.start(`starting parsing numbers for ${country}`);
+  consola.start(`starting parsing numbers for ${country.toString()}`);
   const url = nextUrl ?? getCountryUrl(country);
 
   consola.success(`got url ${url}`);

@@ -1,4 +1,4 @@
-import { Empty, Tabs, notification } from 'antd';
+import { Empty, Menu, notification } from 'antd';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import useFetch from 'use-http';
@@ -41,38 +41,59 @@ const PhoneNumbers: React.FC = () => {
     getPhones();
   }, [country, getPhones]);
 
-  const tabItems = useCallback(() => {
+  const getMenuItems = useCallback(() => {
     const items = getSourceOptions(phones).map((source, index) => ({
       label: source,
-      key: `${index}`,
-      children: (
+      key: source
+    }));
+
+    if (!items.length && isFetching.current) {
+      return [{ label: 'loading', key: 'loading' }];
+    }
+
+    return items;
+  }, [phones]);
+
+  const [selectedItem, setSelectedItem] = useState(getMenuItems().at(0)?.key ?? ALL_SOURCES_TAB);
+
+  const contentPerSource = useCallback(() => {
+    if (!selectedItem && selectedItem === 'loading') {
+      return (
         <PhonesTab
-          tabName={source}
-          phones={filterBySource(phones, source)}
+          phones={filterBySource(phones, ALL_SOURCES_TAB)}
           country={country}
           loading={loading || isFetching.current}
           headerHeight={HEADER_HEIGHT}
         />
-      )
+      );
+    }
+
+    return (
+      <PhonesTab
+        tabName={selectedItem}
+        phones={filterBySource(phones, selectedItem)}
+        country={country}
+        loading={loading || isFetching.current}
+        headerHeight={HEADER_HEIGHT}
+      />
+    );
+  }, [country, loading, phones, selectedItem]);
+
+  const tabItems = useCallback(() => {
+    const items = getSourceOptions(phones).map((source) => ({
+      label: source,
+      key: source
     }));
     if (!items.length && isFetching.current) {
       return [
         {
           label: 'loading',
-          key: `${0}`,
-          children: (
-            <PhonesTab
-              phones={filterBySource(phones, ALL_SOURCES_TAB)}
-              country={country}
-              loading={loading || isFetching.current}
-              headerHeight={HEADER_HEIGHT}
-            />
-          )
+          key: 'loading'
         }
       ];
     }
     return items;
-  }, [country, loading, phones, isFetching]);
+  }, [phones, isFetching]);
 
   if (error) {
     notification.error(error);
@@ -83,20 +104,26 @@ const PhoneNumbers: React.FC = () => {
   }
 
   return (
-    <Tabs
-      defaultActiveKey="1"
-      centered
-      size="large"
-      items={tabItems()}
-      tabBarStyle={{
-        backgroundColor: 'InfoBackground',
-        borderColor: 'InfoBackground',
-        position: 'sticky',
-        top: HEADER_HEIGHT,
-        zIndex: 1,
-        marginBottom: 0
-      }}
-    />
+    <>
+      <Menu
+        onSelect={(e) => setSelectedItem(e.key)}
+        mode="horizontal"
+        selectedKeys={[selectedItem]}
+        items={tabItems()}
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          backgroundColor: 'InfoBackground',
+          borderColor: 'InfoBackground',
+          position: 'sticky',
+          top: HEADER_HEIGHT,
+          zIndex: 1,
+          marginLeft: 10,
+          marginBottom: 0
+        }}
+      />
+      {contentPerSource()}
+    </>
   );
 };
 

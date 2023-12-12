@@ -3,7 +3,6 @@ import { Country } from './index.js';
 
 export enum Source {
   ReceiveSmsFree = 'receive-sms-free.cc',
-  TempNumberCom = 'temp-number.com',
   AnonymSms = 'anonymsms.com',
   QuackrIo = 'quackr.io',
   SmsToMeCom = 'smstome.com',

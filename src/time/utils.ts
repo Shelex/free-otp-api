@@ -13,8 +13,11 @@ export const waitFor = async (condition: () => boolean) => {
 
 type TimeUnit = 's' | 'm' | 'h' | 'd' | 'w';
 
-export const parseTimeAgo = (timeAgo: string): number => {
-  const relativeTimeString = !timeAgo.includes('ago') ? `${timeAgo} ago` : timeAgo;
+export const parseTimeAgo = (timeAgo?: string): number => {
+  if (!timeAgo) {
+    return 0;
+  }
+  const relativeTimeString = !timeAgo?.includes('ago') ? `${timeAgo} ago` : timeAgo;
 
   const timeUnits: Record<TimeUnit, number> = {
     s: 1000,
