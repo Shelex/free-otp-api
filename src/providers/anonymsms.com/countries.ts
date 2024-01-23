@@ -4,7 +4,7 @@ export enum Countries {
   USA = 'united-states',
   UK = 'united-kingdom',
   Georgia = 'georgia',
-  Ukraine = 'ukraine',
+  //Ukraine = 'ukraine',
   Germany = 'germany'
 }
 

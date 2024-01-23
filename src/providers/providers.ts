@@ -48,35 +48,40 @@ export const Sources: Record<Source, Provider> = {
     getPhonesList: getReceiveSmsFreePhones,
     handleOtp: handleReceiveSmsFreeCC,
     countries: receiveSmsFreeCountries,
-    getCountryUrl: getReceiveSmsFreeCountryUrl
+    getCountryUrl: getReceiveSmsFreeCountryUrl,
+    refreshCacheExpression: '10 */8 * * *'
   },
   [Source.AnonymSms]: {
     name: Source.AnonymSms,
     getPhonesList: getAnonymSmsPhones,
     handleOtp: handleAnonymSms,
     countries: anonymSmsCountries,
-    getCountryUrl: getAnonymSmsCountryUrl
+    getCountryUrl: getAnonymSmsCountryUrl,
+    refreshCacheExpression: '20 */8 * * *'
   },
   [Source.QuackrIo]: {
     name: Source.QuackrIo,
     getPhonesList: getQuackrIoPhones,
     handleOtp: handleQuackrIo,
     countries: quackrIoCountries,
-    getCountryUrl: getQuackrIoCountryUrl
+    getCountryUrl: getQuackrIoCountryUrl,
+    refreshCacheExpression: '30 */8 * * *'
   },
   [Source.SmsToMeCom]: {
     name: Source.SmsToMeCom,
     getPhonesList: getSmsToMeComPhones,
     handleOtp: handleSmsToMe,
     countries: smsToMeComCountries,
-    getCountryUrl: getSmsToMeCountryUrl
+    getCountryUrl: getSmsToMeCountryUrl,
+    refreshCacheExpression: '40 */8 * * *'
   },
   [Source.ReceiveSmsCo]: {
     name: Source.ReceiveSmsCo,
     getPhonesList: getReceiveSmsCoPhones,
     handleOtp: handleReceiveSmsCo,
     countries: receiveSmsCoCountries,
-    getCountryUrl: getReceiveSmsCoCountryUrl
+    getCountryUrl: getReceiveSmsCoCountryUrl,
+    refreshCacheExpression: '50 */8 * * *'
   }
 };
 

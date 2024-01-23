@@ -11,6 +11,8 @@ import { ALL_SOURCES_TAB, HEADER_HEIGHT } from './constants';
 const filterBySource = (phones: PhoneRecord[], selectedSource: string) =>
   phones.filter((phone) => (selectedSource !== ALL_SOURCES_TAB ? phone.source === selectedSource : phone));
 
+const loadingMenuItem = { label: 'loading', key: 'loading', disabled: true };
+
 const PhoneNumbers: React.FC = () => {
   const country = useParams().country ?? '';
   const [phones, setPhones] = useState<PhoneRecord[]>([]);
@@ -42,13 +44,13 @@ const PhoneNumbers: React.FC = () => {
   }, [country, getPhones]);
 
   const getMenuItems = useCallback(() => {
-    const items = getSourceOptions(phones).map((source, index) => ({
+    const items = getSourceOptions(phones).map((source) => ({
       label: source,
       key: source
     }));
 
     if (!items.length && isFetching.current) {
-      return [{ label: 'loading', key: 'loading' }];
+      return [loadingMenuItem];
     }
 
     return items;
@@ -85,12 +87,7 @@ const PhoneNumbers: React.FC = () => {
       key: source
     }));
     if (!items.length && isFetching.current) {
-      return [
-        {
-          label: 'loading',
-          key: 'loading'
-        }
-      ];
+      return [loadingMenuItem];
     }
     return items;
   }, [phones, isFetching]);

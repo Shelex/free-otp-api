@@ -166,7 +166,7 @@ export const getReceiveSmsFreePhones = async (
     return { phones: [] };
   }
 
-  const { numbers, nextPageUrl } = await parseNumbersPage(page, url);
+  const { numbers, nextPageUrl } = await parseNumbersPage(page, country, url);
 
   return {
     phones: numbers.map((phone) => ({ phone, url: getPhoneNumberUrl(country, phone) })),
@@ -178,10 +178,16 @@ const elementExist = async (page: Page, locator: string) => {
   return (await page.$(locator).catch(() => null)) !== null;
 };
 
-const parseNumbersPage = async (page: Page, url: string): Promise<{ numbers: string[]; nextPageUrl?: string }> => {
+const parseNumbersPage = async (
+  page: Page,
+  country: Country,
+  url: string
+): Promise<{ numbers: string[]; nextPageUrl?: string }> => {
   await page.goto(url);
   consola.start(`parsing page ${page.url()}...`);
   await page.waitForSelector('.section04 .index-title', { timeout: 5000 });
+  await page.waitForSelector('.layout .index-case', { timeout: 5000 });
+  await delay(1);
 
   const phoneNumberElementsLocator = 'li a[href] > h2 > span';
   const currentPagePhones = await page.$$eval(phoneNumberElementsLocator, (elements) =>
@@ -201,7 +207,19 @@ const parseNumbersPage = async (page: Page, url: string): Promise<{ numbers: str
   }
   consola.success(`can see pagination element`);
 
-  const nextPageUrl = await page.$eval(paginationLocator, (el) => el?.href);
+  const nextPageFromPagination = await page.$eval(paginationLocator, (el) => el?.href);
+
+  if (!nextPageFromPagination || nextPageFromPagination === url) {
+    return { numbers };
+  }
+
+  const nextPageHtml = nextPageFromPagination.split('/').pop();
+
+  if (!nextPageHtml) {
+    return { numbers };
+  }
+
+  const nextPageUrl = `${getCountryUrl(country)}${nextPageHtml}`;
 
   if (nextPageUrl === url) {
     return { numbers };

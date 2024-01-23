@@ -30,6 +30,10 @@ export const getSmsToMeComPhones = async (page: Page, country: Country, nextUrl?
   return await parseNumbersPage(url, page);
 };
 
+const elementExist = async (page: Page, locator: string) => {
+  return (await page.$(locator).catch(() => null)) !== null;
+};
+
 const parseNumbersPage = async (url: string, page: Page, target?: string): Promise<PhoneNumberListReply> => {
   await page.goto(url);
   consola.start(`parsing page ${page.url()}...`);
@@ -49,9 +53,22 @@ const parseNumbersPage = async (url: string, page: Page, target?: string): Promi
     }
   }
 
-  const paginationLocator = 'div.pagination > a';
+  const paginationLocator = 'div.pagination a';
+  const hasPagination = await elementExist(page, paginationLocator);
+
+  if (!hasPagination) {
+    return { phones };
+  }
+
+  const activePageLocator = 'div.pagination a.active';
+  const activePageText = await page.$eval(activePageLocator, (el) => el?.textContent?.trim());
+  if (!activePageText) {
+    return { phones };
+  }
+
   const links = await page.$$eval(paginationLocator, (elements) => elements.map((a) => a.href));
-  const next = links.at(-1);
+
+  const next = links.find((link) => link.endsWith(`page=${parseInt(activePageText ?? '0') + 1}`));
   if (!next || next === page.url()) {
     return { phones };
   }

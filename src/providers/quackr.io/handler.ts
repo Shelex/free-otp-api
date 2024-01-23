@@ -50,7 +50,7 @@ const parseNumbersPage = async (url: string, page: Page): Promise<{ numbers: str
 
   const getPhones = async (attempt = 1): Promise<string[]> => {
     await page.waitForSelector('country-page section', { timeout: 5000 });
-    const availablePhonesLocator = '.columns.is-multiline:nth-child(4)';
+    const availablePhonesLocator = '.columns.is-multiline';
     const phoneNumberElementsLocator = `${availablePhonesLocator} p.title.is-5-small.mb-1 a`;
     const phones = await page.$$eval(phoneNumberElementsLocator, (elements) =>
       elements.map((el) => el?.textContent?.trim())

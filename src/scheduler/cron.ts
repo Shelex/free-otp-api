@@ -30,7 +30,7 @@ export const createJob = (provider: Provider, scheduleExpression: string) =>
   });
 
 export const jobs = providers.reduce((jobs, provider) => {
-  const job = createJob(provider, provider.refreshCacheExpression ?? '30 */10 * * *');
+  const job = createJob(provider, provider.refreshCacheExpression ?? '30 */8 * * *');
   jobs[provider.name] = job;
   consola.info(`[cache-job] created for ${provider.name}, next runs: ${JSON.stringify(job.nextRuns(10), null, 2)}`);
   return jobs;

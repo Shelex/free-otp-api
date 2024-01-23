@@ -17,8 +17,9 @@ export const getCountryUrl = (country: Country) => {
   return `${baseUrl}/${Countries[country as keyof typeof Countries]}/`;
 };
 
-const getPhoneNumberUrl = (phone: string) => {
-  return `${baseUrl}/number/${phone.replace('+', '')}/`;
+const getPhoneNumberUrl = (country: Country, phone: string) => {
+  const withCountryCode = country === 'USA' && !phone.startsWith('+') && !phone.startsWith('1') ? `1${phone}` : phone;
+  return `${baseUrl}/number/${withCountryCode.replace('+', '')}/`;
 };
 
 export const getAnonymSmsPhones = async (page: Page, country: Country): Promise<PhoneNumberListReply> => {
@@ -34,7 +35,7 @@ export const getAnonymSmsPhones = async (page: Page, country: Country): Promise<
   const numbers = await parseNumbersPage(page);
 
   return {
-    phones: numbers.map((phone) => ({ phone, url: getPhoneNumberUrl(phone) })),
+    phones: numbers.map((phone) => ({ phone, url: getPhoneNumberUrl(country, phone) })),
     nextPageUrl: ''
   };
 };
@@ -57,7 +58,7 @@ const parseNumbersPage = async (page: Page, phones: string[] = []): Promise<stri
 };
 
 const numberIsOnline = async (page: Page, country: Country, phoneNumber: string) => {
-  const url = getPhoneNumberUrl(phoneNumber);
+  const url = getPhoneNumberUrl(country, phoneNumber);
 
   await page.goto(url);
   await delay(1);
@@ -119,7 +120,7 @@ const recursivelyCheckMessages = async (
   if (matches.length) {
     return matches.map((match) => ({
       ...match,
-      ...{ otp: tryParseOtpCode(match.message) }
+      otp: tryParseOtpCode(match.message)
     }));
   }
 

@@ -4,7 +4,7 @@ import useFetch, { CachePolicies } from 'use-http';
 import { baseUrl, endpoints } from '../../api';
 import { Message, PhoneMessagesResponse } from '../../types';
 import MessagesTable from './MessagesTable';
-import { Button, Flex } from 'antd';
+import { Button, Flex, Typography } from 'antd';
 import { StepForwardOutlined, StepBackwardOutlined, RedoOutlined } from '@ant-design/icons';
 
 const PhoneMessages: React.FC = () => {
@@ -60,6 +60,7 @@ const PhoneMessages: React.FC = () => {
         <Button icon={<StepBackwardOutlined />} onClick={() => navigate(`/phones/${country}`)}>
           To Phone Numbers
         </Button>
+        <Typography.Text strong copyable>{phone}</Typography.Text>
         {messages.length ? (
           <Button icon={<RedoOutlined />} onClick={async () => await getMessages(true)}>
             Refresh

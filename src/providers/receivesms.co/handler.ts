@@ -130,7 +130,7 @@ const parseMessages = async (page: Page) => {
       return {
         ago: isGoogleAds ? 0 : agoParsed,
         agoText: sanitizedAgo,
-        message: messages.join(' ')
+        message: messages.join(' ').split('- -').pop()
       } as Message;
     })
     .filter((message) => message.ago);
