@@ -19,7 +19,7 @@ const PhoneMessages: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
 
   const { error, get, loading, response } = useFetch(baseUrl, { cachePolicy: CachePolicies.NO_CACHE });
-  const isFetching = useRef(false);
+  const isFetching = useRef(true);
 
   const noMessages = response.ok && !messages.length;
 
@@ -47,11 +47,11 @@ const PhoneMessages: React.FC = () => {
   );
 
   useEffect(() => {
-    if (!country || !phone) {
+    if (!country || !phone || loading) {
       return;
     }
     getMessages();
-  }, [country, phone, getMessages]);
+  }, [country, phone, getMessages, loading]);
 
   return (
     <>
@@ -60,7 +60,9 @@ const PhoneMessages: React.FC = () => {
         <Button icon={<StepBackwardOutlined />} onClick={() => navigate(`/phones/${country}`)}>
           To Phone Numbers
         </Button>
-        <Typography.Text strong copyable>{phone}</Typography.Text>
+        <Typography.Text strong copyable>
+          {phone}
+        </Typography.Text>
         {messages.length ? (
           <Button icon={<RedoOutlined />} onClick={async () => await getMessages(true)}>
             Refresh

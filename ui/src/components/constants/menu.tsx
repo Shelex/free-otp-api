@@ -3,9 +3,8 @@ import { Typography } from 'antd';
 import { GithubOutlined, ExperimentOutlined } from '@ant-design/icons';
 import routes from '../../routes/routes';
 
-
-const githubRepoUrl = "https://github.com/Shelex/free-otp-api";
-const swaggerUrl = "https://otp.shelex.dev/docs";
+const githubRepoUrl = 'https://github.com/Shelex/free-otp-api';
+const swaggerUrl = 'https://otp.shelex.dev/docs';
 
 const externalRoutes = [
   {
@@ -13,7 +12,11 @@ const externalRoutes = [
     path: {
       path: githubRepoUrl
     },
-    label: <Typography.Link href={githubRepoUrl} target="_blank">Github</Typography.Link>,
+    label: (
+      <Typography.Link href={githubRepoUrl} target="_blank">
+        Github
+      </Typography.Link>
+    ),
     icon: <GithubOutlined />
   },
   {
@@ -21,7 +24,11 @@ const externalRoutes = [
     path: {
       path: swaggerUrl
     },
-    label: <Typography.Link href={swaggerUrl} target="_blank">Swagger</Typography.Link>,
+    label: (
+      <Typography.Link href={swaggerUrl} target="_blank">
+        Swagger
+      </Typography.Link>
+    ),
     icon: <ExperimentOutlined />
   }
 ];
@@ -35,4 +42,5 @@ export const menuItems = routes
     },
     label: <NavLink to={route.path}>{route.name}</NavLink>,
     icon: <route.icon />
-  })).concat(externalRoutes);
+  }))
+  .concat(externalRoutes);

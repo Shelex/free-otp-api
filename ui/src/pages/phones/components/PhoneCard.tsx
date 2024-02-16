@@ -3,8 +3,8 @@ import ReactCountryFlag from 'react-country-flag';
 import { PhoneRecordCard } from '../../../types';
 import { uniqueId } from 'lodash';
 import { IsoCode } from '../../countries/constants/iso';
-import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
+import { formatPhoneNumberForDisplay } from './helpers';
 
 interface Props {
   phone?: PhoneRecordCard;
@@ -13,13 +13,10 @@ interface Props {
 }
 
 const PhoneCard: React.FC<Props> = ({ countryName, phone, loading }) => {
-  const navigate = useNavigate();
   const match = Object.keys(IsoCode).find((item) => item === countryName) as keyof typeof IsoCode;
   const iso = IsoCode[match] ?? IsoCode.Unknown;
   const isAvailable = countryName && phone;
-
-  const isUSA = phone?.value && countryName === 'USA';
-  const phoneEdited = isUSA ? `+1${phone.value}` : phone?.value;
+  const phoneFormatted = formatPhoneNumberForDisplay(countryName, phone?.value);
 
   const [activeSourceTab, setActiveSourceTab] = useState(phone?.sources?.at(0)?.name);
   const activeTabSource = phone?.sources.find((source) => source.name === activeSourceTab);
@@ -43,7 +40,7 @@ const PhoneCard: React.FC<Props> = ({ countryName, phone, loading }) => {
       title={
         <>
           <Typography.Title copyable={!loading} level={5}>
-            {phoneEdited}
+            {phoneFormatted}
           </Typography.Title>
           <Tabs activeKey={activeSourceTab} onChange={setActiveSourceTab} size="small" items={sourceTabs} />
         </>
@@ -60,15 +57,16 @@ const PhoneCard: React.FC<Props> = ({ countryName, phone, loading }) => {
               width: '12em',
               height: '10em'
             }}
-            onClick={() =>
-              phone &&
-              !loading &&
-              navigate(
-                `/messages/${countryName}/${activeTabSource?.name ?? ''}/${(isUSA ? `1${phone?.value}` : phone?.value)
-                  ?.replace('+', '')
-                  ?.trim()}?url=${activeTabSource?.url}`
-              )
-            }
+            onClick={() => {
+              if (phone && !loading) {
+                return window.open(
+                  `/messages/${countryName}/${activeTabSource?.name ?? ''}/${phoneFormatted
+                    ?.replace('+', '')
+                    ?.trim()}?url=${activeTabSource?.url}`,
+                  '_blank'
+                );
+              }
+            }}
           />
         ) : (
           <Skeleton

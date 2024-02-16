@@ -28,7 +28,7 @@ export const AppLayout: React.F = () => (
           <Outlet />
         </OutletTransaction>
       </Content>
-      <Layout.Footer style={{ textAlign: 'center' }}>Oleksandr Shevtsov ©2023</Layout.Footer>
+      <Layout.Footer style={{ textAlign: 'center' }}>Oleksandr Shevtsov ©2023-2024</Layout.Footer>
     </Layout>
   </Layout>
 );
