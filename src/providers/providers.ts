@@ -32,6 +32,15 @@ import {
   countries as receiveSmsOnlineComCountries,
   Countries as ReceiveSmsOnlineComCountries
 } from './receiveasmsonline.com/countries.js';
+import {
+  handleGetFreeSmsNumberCom,
+  getFreeSmsNumberPhones,
+  getCountryUrl as getFreeSmsNumberComCountryUrl
+} from './getfreesmsnumber.com/handler.js';
+import {
+  countries as getFreeSmsNumberComCountries,
+  Countries as GetFreeSmsNumberComCountries
+} from './getfreesmsnumber.com/countries.js';
 import { Provider, Source } from './types.js';
 
 export type Country =
@@ -40,7 +49,8 @@ export type Country =
   | keyof typeof QuackrIoCountries
   | keyof typeof SmsToMeComCountries
   | keyof typeof ReceiveSmsCoCountries
-  | keyof typeof ReceiveSmsOnlineComCountries;
+  | keyof typeof ReceiveSmsOnlineComCountries
+  | keyof typeof GetFreeSmsNumberComCountries;
 
 export const allowedCountries = Array.from(
   new Set([
@@ -49,7 +59,8 @@ export const allowedCountries = Array.from(
     ...quackrIoCountries,
     ...smsToMeComCountries,
     ...receiveSmsCoCountries,
-    ...receiveSmsOnlineComCountries
+    ...receiveSmsOnlineComCountries,
+    ...getFreeSmsNumberComCountries
   ])
 );
 
@@ -101,6 +112,14 @@ export const Sources: Record<Source, Provider> = {
     countries: receiveSmsOnlineComCountries,
     getCountryUrl: getReceiveSmsOnlineCountryUrl,
     refreshCacheExpression: '40 */8 * * *'
+  },
+  [Source.GetFreeSmsNumberCom]: {
+    name: Source.GetFreeSmsNumberCom,
+    getPhonesList: getFreeSmsNumberPhones,
+    handleOtp: handleGetFreeSmsNumberCom,
+    countries: getFreeSmsNumberComCountries,
+    getCountryUrl: getFreeSmsNumberComCountryUrl,
+    refreshCacheExpression: '45 */8 * * *'
   }
 };
 

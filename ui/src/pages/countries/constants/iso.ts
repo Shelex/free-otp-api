@@ -3,6 +3,7 @@ export enum IsoCode {
   UK = 'GB',
   Australia = 'AU',
   Austria = 'AT',
+  Azerbaijan = 'AZ',
   Belgium = 'BE',
   Bulgaria = 'BG',
   Brazil = 'BR',
@@ -28,6 +29,7 @@ export enum IsoCode {
   Kenya = 'KE',
   SouthKorea = 'KR',
   Latvia = 'LV',
+  Libya = 'LY',
   Lithuania = 'LT',
   Macao = 'MO',
   Malaysia = 'MY',
@@ -59,5 +61,6 @@ export enum IsoCode {
   Ukraine = 'UA',
   Uzbekistan = 'UZ',
   Vietnam = 'VN',
+  Zimbabwe = 'ZW',
   Unknown = 'N/A'
 }
