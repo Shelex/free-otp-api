@@ -1,4 +1,4 @@
-import { Button, Card, Row, Skeleton, Typography } from 'antd';
+import { Badge, Button, Card, Row, Skeleton, Typography } from 'antd';
 import ReactCountryFlag from 'react-country-flag';
 import { IsoCode } from '../constants/iso';
 import { CountryRecord } from '../../../types';
@@ -10,10 +10,17 @@ interface Props {
   loading?: boolean;
 }
 
+const getTotalCount = (country?: CountryRecord) =>
+  country?.sources.reduce((sum, source) => {
+    sum += source.count ?? 0;
+    return sum;
+  }, 0) ?? 0;
+
 const CountryCard: React.FC<Props> = ({ country, loading }) => {
   const navigate = useNavigate();
   const match = Object.keys(IsoCode).find((item) => item === country?.name) as keyof typeof IsoCode;
   const iso = IsoCode[match] ?? IsoCode.Unknown;
+  const totalCount = getTotalCount(country);
 
   return !!country || loading ? (
     <Card
@@ -52,6 +59,14 @@ const CountryCard: React.FC<Props> = ({ country, loading }) => {
         )
       }
       onClick={() => !loading && country && navigate(`/phones/${country?.name}`)}
+      extra={
+        <Badge
+          count={totalCount}
+          overflowCount={99999}
+          color={totalCount > 0 ? 'geekblue' : 'volcano'}
+          status={totalCount > 0 ? 'success' : 'processing'}
+        />
+      }
     >
       <Row>
         {country?.sources?.map((source) => (

@@ -6,13 +6,14 @@ export const transformCountryToCountryRecord = (countries?: Country[]) =>
     if (countryIndex > -1) {
       records[countryIndex].sources.push({
         name: country.source,
-        url: country.url
+        url: country.url,
+        count: country.count
       });
       return records;
     }
     records.push({
       name: country.country,
-      sources: [{ name: country.source, url: country.url }]
+      sources: [{ name: country.source, url: country.url, count: country.count }]
     });
     return records;
   }, [] as CountryRecord[]) ?? [];

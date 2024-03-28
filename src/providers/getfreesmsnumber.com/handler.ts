@@ -7,7 +7,7 @@ import { tryParseOtpCode } from '../helpers.js';
 import { defaultRecheckDelay } from '../constants.js';
 import { Country } from '../providers.js';
 
-const baseUrl = 'https://getfreesmsnumber.com/';
+const baseUrl = 'https://getfreesmsnumber.com';
 
 export const getCountryUrl = (country: Country) => {
   if (!countries.includes(country)) {
@@ -38,8 +38,27 @@ const elementExist = async (page: Page, locator: string) => {
   return (await page.$(locator).catch(() => null)) !== null;
 };
 
-const parseNumbersPage = async (url: string, page: Page, target?: string): Promise<PhoneNumberListReply> => {
+const openPage = async (page: Page, url: string) => {
   await page.goto(url);
+  await page.waitForNetworkIdle({ idleTime: 2500 });
+};
+
+const parseNumbersPage = async (url: string, page: Page, target?: string): Promise<PhoneNumberListReply> => {
+  const retryOpening = async (page: Page, url: string, attempt: number = 1): Promise<void> => {
+    if (attempt > 5) {
+      return;
+    }
+
+    await openPage(page, url);
+
+    if (page.url().includes('simcodes')) {
+      console.log(`found incorrect redirection, retrying...`);
+      delay(5);
+      return await retryOpening(page, url, attempt + 1);
+    }
+  };
+
+  await retryOpening(page, url);
   consola.start(`parsing page ${page.url()}...`);
   await page.waitForSelector('.container .row .card:nth-child(1)', { timeout: 5000 });
   const phoneNumberElementsLocator = '.card .card-text a';
@@ -140,6 +159,7 @@ const recursivelyCheckMessages = async (
   recheckDelay: number
 ): Promise<Message | Message[]> => {
   await page.waitForNetworkIdle({ idleTime: 2500 });
+  await delay(3);
 
   const parsed = (await parseMessages(page)) || [];
   if (!parsed.length) {

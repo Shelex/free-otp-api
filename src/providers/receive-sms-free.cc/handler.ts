@@ -25,22 +25,9 @@ const getPhoneNumberUrl = (country: Country, phone: string) => {
 const numberIsOnline = async (page: Page, country: Country, phoneNumber: string) => {
   const url = getPhoneNumberUrl(country, phoneNumber);
 
-  await page.goto(url);
+  const result = await page.goto(url);
 
-  const locator = `h1[data-clipboard-text="${phoneNumber}"]`;
-
-  const is404 = await page.$eval('body > center > h1', () => true).catch(() => false);
-  const isSnowy404 = await page.$eval('canvas#snow', () => true).catch(() => false);
-
-  if (is404 || isSnowy404) {
-    return '404';
-  }
-
-  await page.waitForSelector(locator);
-
-  const title = await page.$eval(`${locator} img`, (img) => img.title);
-
-  return title === 'Number Online';
+  return !!result;
 };
 
 export interface Message {
@@ -135,9 +122,6 @@ export const handleReceiveSmsFreeCC = async (page: Page, options: OtpRouteHandle
   const isAlive = await numberIsOnline(page, options.country, options.phoneNumber);
   if (!isAlive) {
     throw new Error('number is offline');
-  }
-  if (isAlive === '404') {
-    throw new Error('number returned 404');
   }
 
   consola.success(`number ${options.phoneNumber} is online`);

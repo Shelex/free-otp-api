@@ -34,11 +34,27 @@ const Countries: React.FC = () => {
   return (
     <Flex justify="center" wrap="wrap" gap="middle">
       {error && <p>Error: {error?.message}</p>}
-      {(isFetching.current || loading ? Array.from({ length: 24 }) : countries).map((country) => (
+      {(isFetching.current || loading ? Array.from({ length: 24 }) : reorder(countries)).map((country) => (
         <CountryCard key={uniqueId()} country={country as CountryRecord} loading={isFetching.current || loading} />
       ))}
     </Flex>
   );
 };
+
+const sortCountries = (a: unknown, b: unknown) => {
+  const country1 = a as CountryRecord;
+  const country2 = b as CountryRecord;
+  if (!country1?.name || !country2?.name) {
+    return 1;
+  }
+
+  return country1.name.localeCompare(country2.name);
+};
+
+const firstAccess = ['USA', 'UK', 'Ukraine', 'France', 'Netherlands'];
+const reorder = (countries: CountryRecord[]) => [
+  ...countries.filter((c) => firstAccess.includes(c.name)),
+  ...countries.filter((c) => !firstAccess.includes(c.name)).sort(sortCountries)
+];
 
 export default Countries;

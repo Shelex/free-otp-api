@@ -9,7 +9,8 @@ export const replyCountriesSchema = {
     properties: {
       url: { type: 'string' },
       country: { type: 'string' },
-      source: { type: 'string' }
+      source: { type: 'string' },
+      count: { type: 'number' }
     }
   },
   additionalProperties: false

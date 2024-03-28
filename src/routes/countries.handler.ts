@@ -1,20 +1,33 @@
 import { type RouteHandler } from 'fastify';
 import { type ReplyCountries, type ReplyCountriesError } from './countries.schema.js';
 import { consola } from 'consola';
-import { providers } from '../providers/index.js';
+import { PhoneNumber, providers } from '../providers/index.js';
+import { getPhones } from '../repository/redis.js';
+
+const getAvailableCountries = () =>
+  Promise.all(
+    providers.flatMap(
+      async (provider) =>
+        await Promise.all(
+          provider.countries.map(async (country) => {
+            const phones = (await getPhones(provider.name, country)) as PhoneNumber[];
+            return {
+              country: country,
+              source: provider.name,
+              url: provider.getCountryUrl(country),
+              count: phones.length ?? 0
+            };
+          })
+        )
+    )
+  );
 
 export const listCountriesHandler: RouteHandler<{
   Reply: ReplyCountries | ReplyCountriesError;
 }> = async function (req, reply) {
   try {
-    const countries = providers.flatMap((provider) =>
-      provider.countries.map((name) => ({
-        country: name,
-        source: provider.name,
-        url: provider.getCountryUrl(name)
-      }))
-    );
-
+    const providerRecords = await getAvailableCountries();
+    const countries = providerRecords.flat();
     reply.send(countries);
   } catch (error) {
     consola.warn(error);

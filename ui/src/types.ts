@@ -2,11 +2,13 @@ export interface Country {
   url: string;
   country: string;
   source: string;
+  count: number;
 }
 
 export interface Source {
   name: string;
   url: string;
+  count: number;
 }
 
 export interface CountryRecord {
