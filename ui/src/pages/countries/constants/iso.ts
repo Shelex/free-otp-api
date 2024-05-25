@@ -51,6 +51,7 @@ export enum IsoCode {
   SouthAfrica = 'ZA',
   Spain = 'ES',
   Singapore = 'SG',
+  SriLanka = 'LK',
   Sweden = 'SE',
   Switzerland = 'CH',
   Taiwan = 'TW',

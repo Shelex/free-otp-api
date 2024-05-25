@@ -52,7 +52,7 @@ const parseNumbersPage = async (url: string, page: Page, target?: string): Promi
     await openPage(page, url);
 
     if (page.url().includes('simcodes')) {
-      console.log(`found incorrect redirection, retrying...`);
+      consola.info(`found incorrect redirection, retrying...`);
       delay(5);
       return await retryOpening(page, url, attempt + 1);
     }
