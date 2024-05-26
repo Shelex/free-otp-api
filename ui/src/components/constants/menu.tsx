@@ -17,7 +17,7 @@ const externalRoutes = [
         Github
       </Typography.Link>
     ),
-    icon: <GithubOutlined />
+    icon: <GithubOutlined onPointerEnterCapture={undefined} onPointerLeaveCapture={undefined} />
   },
   {
     key: 'swagger',
@@ -29,7 +29,7 @@ const externalRoutes = [
         Swagger
       </Typography.Link>
     ),
-    icon: <ExperimentOutlined />
+    icon: <ExperimentOutlined onPointerEnterCapture={undefined} onPointerLeaveCapture={undefined} />
   }
 ];
 
@@ -41,6 +41,6 @@ export const menuItems = routes
       path: route.path
     },
     label: <NavLink to={route.path}>{route.name}</NavLink>,
-    icon: <route.icon />
+    icon: <route.icon onPointerEnterCapture={undefined} onPointerLeaveCapture={undefined}/>
   }))
   .concat(externalRoutes);
