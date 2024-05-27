@@ -2,7 +2,7 @@
 
 Get list of phone numbers and specific sms for specific phone number to use in tests which involve a lot of otp codes.
 
-<a href="https://otp.shelex.dev/docs"><img src="https://raw.githubusercontent.com/swagger-api/swagger.io/wordpress/images/assets/SW-logo-clr.png" height="50"></a>
+<a href="https://otp-api.shelex.dev/docs"><img src="https://raw.githubusercontent.com/swagger-api/swagger.io/wordpress/images/assets/SW-logo-clr.png" height="50"></a>
 
 ## Description
 
@@ -22,19 +22,21 @@ Get list of phone numbers and specific sms for specific phone number to use in t
 
 ## API
 
+API has `https://otp-api.shelex.dev/api/` baseUrl.  
+
 - get list of countries available:
   ```bash
-      GET https://otp.shelex.dev/api/countries
+      GET https://otp-api.shelex.dev/api/countries
   ```
 - get list of phone numbers per country:
   ```bash
-      GET https://otp.shelex.dev/api/list/{{country}}
+      GET https://otp-api.shelex.dev/api/list/{{country}}
   ```
 - get otp code:
   ```
-      GET https://otp.shelex.dev/api/{{country}}/{{phone}}?match={{substring}}&ago={{ago}}
+      GET https://otp-api.shelex.dev/api/{{country}}/{{phone}}?match={{substring}}&ago={{ago}}
   ```
-  - `country` is a country name - USA, UK, Ukraine, Canada, Moldova, Spain... full list in [docs](https://otp.shelex.dev/docs/static/index.html) in "available values" section. Basically is a union of all supported countries across services.
+  - `country` is a country name - USA, UK, Ukraine, Canada, Moldova, Spain... full list in [docs](https://otp-api.shelex.dev/docs/static/index.html) in "available values" section. Basically is a union of all supported countries across services.
   - `phone` - is a phone number as it is specified in url, 10-13 digits, without "+" sign
   - `match` (optional) - substring to look for in the sms
   - `ago` (optional, `30s` by default) - the max time ago to look for specific sms, units are `s` - secons, `m` - minutes, `h` - hours, for example: `10s`, `5m`, `1h`, etc. Will be converted to timestamp.

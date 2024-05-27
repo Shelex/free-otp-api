@@ -2,9 +2,10 @@ import { NavLink } from 'react-router-dom';
 import { Typography } from 'antd';
 import { GithubOutlined, ExperimentOutlined } from '@ant-design/icons';
 import routes from '../../routes/routes';
+import { root } from '../../api';
 
 const githubRepoUrl = 'https://github.com/Shelex/free-otp-api';
-const swaggerUrl = 'https://otp.shelex.dev/docs';
+const swaggerUrl = `${root}/docs`;
 
 const externalRoutes = [
   {

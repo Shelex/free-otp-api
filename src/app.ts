@@ -10,7 +10,7 @@ import { jobs } from './scheduler/cron.js';
 
 dotenv.config();
 
-const app = Fastify({ logger: true });
+const app = Fastify();
 await app.register(cors);
 await app.register(health);
 await app.register(swagger);
