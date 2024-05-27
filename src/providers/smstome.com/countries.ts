@@ -7,7 +7,7 @@ export enum Countries {
   France = 'france',
   Sweden = 'sweden',
   Finland = 'finland',
-  Denmark = 'denmark',
+  //Denmark = 'denmark',
   Belgium = 'belgium',
   Netherlands = 'netherlands'
 }
