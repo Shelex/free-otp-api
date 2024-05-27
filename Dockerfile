@@ -6,6 +6,8 @@ WORKDIR /app
 
 COPY --chown=node:node package.json yarn.lock ./
 
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
+
 RUN yarn
 
 COPY --chown=node:node . .
