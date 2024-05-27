@@ -3,7 +3,7 @@ import { consola } from 'consola';
 import { Country, PhoneNumber, PhoneNumberListReply, Provider } from '../providers/index.js';
 import { delay } from '../time/utils.js';
 
-export const getPhonesListTask = async (country: Country, provider: Provider): Promise<PhoneNumber[]> => {
+export const getPhonesListTask = async (country: Country, provider: Provider, attempt = 1): Promise<PhoneNumber[]> => {
   try {
     if (!provider.countries.includes(country)) {
       return [];
@@ -40,8 +40,13 @@ export const getPhonesListTask = async (country: Country, provider: Provider): P
     return result ?? [];
   } catch (e) {
     consola.warn(`failed to fetch phones for ${provider.name} in ${country.toString()}, will retry`);
+
+    if (attempt >= 5) {
+      return [];
+    }
+
     await delay(10);
     consola.warn(e);
-    return await getPhonesListTask(country, provider);
+    return await getPhonesListTask(country, provider, attempt + 1);
   }
 };
