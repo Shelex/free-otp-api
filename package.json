@@ -26,6 +26,7 @@
     "croner": "7.0.5",
     "dotenv": "16.3.1",
     "fastify": "4.24.3",
+    "fastify-healthcheck": "^4.4.0",
     "json-schema-to-ts": "2.9.2",
     "puppeteer": "19.11.1",
     "puppeteer-cluster": "0.23.0",

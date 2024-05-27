@@ -4,13 +4,15 @@ import { browser } from './browser/cluster.js';
 import { setGracefulShutdown } from './gracefulShutdown.js';
 import swagger from './plugins/swagger.js';
 import cors from './plugins/cors.js';
+import health from './plugins/health.js';
 import routes from './routes/index.js';
 import { jobs } from './scheduler/cron.js';
 
 dotenv.config();
 
-const app = Fastify();
+const app = Fastify({ logger: true });
 await app.register(cors);
+await app.register(health);
 await app.register(swagger);
 await app.register(routes);
 
@@ -24,6 +26,6 @@ setGracefulShutdown();
 // resume all jobs when app initialized
 Object.values(jobs).map((job) => job.resume());
 
-app.listen({ port: parseInt(process.env.PORT ?? '') || 3030 }, (err) => {
+app.listen({ port: parseInt(process.env.PORT ?? '') || 3030, host: process.env.HOST }, (err) => {
   if (err) throw err;
 });
