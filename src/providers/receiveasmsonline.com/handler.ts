@@ -175,12 +175,14 @@ const parseNumbersPage = async (url: string, page: Page, country: Country): Prom
   const phones = await page.$$eval(
     phonesLocator,
     (links, baseUrl) =>
-      links.map((link) => {
-        return {
-          phone: link.getAttribute('href')?.trim()?.split('/')?.at(2) ?? '',
-          url: `${baseUrl}${link?.getAttribute('href')}`
-        };
-      }),
+      links
+        .map((link) => {
+          return {
+            phone: link.getAttribute('href')?.trim()?.split('/')?.at(2) ?? '',
+            url: `${baseUrl}${link?.getAttribute('href')}`
+          };
+        })
+        .filter((record) => record.phone.length >= 10 || record.phone.length <= 13),
     baseUrl
   );
 
