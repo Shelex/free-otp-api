@@ -56,19 +56,29 @@ const PhoneMessages: React.FC = () => {
   return (
     <>
       {error && <p>Error: {error?.message}</p>}
-      <Flex justify="center" wrap="wrap" gap="large">
-        <Button icon={<StepBackwardOutlined onPointerEnterCapture={undefined} onPointerLeaveCapture={undefined} />} onClick={() => navigate(`/phones/${country}`)}>
+      <Flex justify="center" align="center" wrap="wrap" gap="large">
+        <Button
+          icon={<StepBackwardOutlined onPointerEnterCapture={undefined} onPointerLeaveCapture={undefined} />}
+          onClick={() => navigate(`/phones/${country}`)}
+        >
           To Phone Numbers
         </Button>
         <Typography.Text strong copyable>
           {phone}
         </Typography.Text>
         {messages.length ? (
-          <Button icon={<RedoOutlined onPointerEnterCapture={undefined} onPointerLeaveCapture={undefined} />} onClick={async () => await getMessages(true)}>
+          <Button
+            icon={<RedoOutlined onPointerEnterCapture={undefined} onPointerLeaveCapture={undefined} />}
+            onClick={async () => await getMessages(true)}
+          >
             Refresh
           </Button>
         ) : null}
-        <Button icon={<StepForwardOutlined onPointerEnterCapture={undefined} onPointerLeaveCapture={undefined} />} href={messages?.at(0)?.url ?? sourceUrl ?? ''} target="_blank">
+        <Button
+          icon={<StepForwardOutlined onPointerEnterCapture={undefined} onPointerLeaveCapture={undefined} />}
+          href={messages?.at(0)?.url ?? sourceUrl ?? ''}
+          target="_blank"
+        >
           To {source}
         </Button>
       </Flex>

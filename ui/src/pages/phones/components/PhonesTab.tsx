@@ -1,9 +1,10 @@
-import { Flex, Pagination } from 'antd';
+import { Flex, Input, Pagination } from 'antd';
 import { useCallback, useState } from 'react';
 import { PhoneRecord, PhoneRecordCard } from '../../../types';
 import PhoneCard from './PhoneCard';
 import { uniqBy, uniqueId } from 'lodash';
 import { transformPhoneRecords } from './helpers';
+import { SearchOutlined } from '@ant-design/icons';
 
 interface Props {
   tabName?: string;
@@ -19,6 +20,8 @@ const DEFAULT_PAGE_SIZE = PAGE_SIZE_OPTIONS.at(1) ?? 40;
 const PhonesTab: React.FC<Props> = ({ phones, country, loading, headerHeight, tabName }) => {
   const [showPhones, setShowPhones] = useState<PhoneRecord[]>([]);
   const [paginationInfo, setPaginationInfo] = useState({ current: 1, pageSize: DEFAULT_PAGE_SIZE });
+  const [queryPhones, setQueryPhones] = useState<PhoneRecord[]>([]);
+  const [queryFailed, setQueryFailed] = useState(false);
 
   const onSetPage = useCallback(
     (page: number, pageSize: number) => {
@@ -33,20 +36,31 @@ const PhonesTab: React.FC<Props> = ({ phones, country, loading, headerHeight, ta
     [phones]
   );
 
+  const onSearch = (query?: string) => {
+    const queried = query ? phones.filter((p) => p.value.replace('+', '').includes(query.replace('+', ''))) : [];
+    setQueryFailed(!!query && !queried.length);
+    setQueryPhones(queried);
+  };
+
   const getCardRecords = useCallback(() => {
     if (loading) {
       return Array.from({ length: 24 });
     }
+
+    if (!!queryPhones.length !== queryFailed) {
+      return transformPhoneRecords(queryPhones);
+    }
+
     const phonesPerPage = showPhones.length ? showPhones : phones.slice(0, paginationInfo.pageSize);
     return transformPhoneRecords(phonesPerPage);
-  }, [loading, paginationInfo, phones, showPhones]);
+  }, [loading, paginationInfo, phones, queryFailed, queryPhones, showPhones]);
 
   return (
     <>
       {phones.length ? (
         <Flex
           justify="center"
-          gap="large"
+          gap={50}
           style={{
             padding: 3,
             position: 'sticky',
@@ -55,6 +69,15 @@ const PhonesTab: React.FC<Props> = ({ phones, country, loading, headerHeight, ta
             zIndex: 1
           }}
         >
+          <Input
+            size="middle"
+            status={queryFailed ? 'error' : ''}
+            style={{ width: '20%' }}
+            placeholder="Search"
+            allowClear
+            addonBefore={<SearchOutlined onPointerEnterCapture={undefined} onPointerLeaveCapture={undefined} />}
+            onChange={(e) => onSearch(e.target.value ?? '')}
+          />
           <Pagination
             total={uniqBy(phones, 'value').length}
             showTotal={(total, range) => `${range[0]}-${range[1]} of ${total} phone numbers`}
@@ -62,11 +85,8 @@ const PhonesTab: React.FC<Props> = ({ phones, country, loading, headerHeight, ta
             defaultCurrent={1}
             pageSizeOptions={PAGE_SIZE_OPTIONS}
             {...paginationInfo}
-            disabled={loading}
+            disabled={loading || !!queryPhones.length || queryFailed}
             onChange={onSetPage}
-            style={{
-              width: '100%'
-            }}
           />
         </Flex>
       ) : null}
