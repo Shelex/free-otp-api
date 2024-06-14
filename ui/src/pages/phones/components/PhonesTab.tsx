@@ -60,7 +60,7 @@ const PhonesTab: React.FC<Props> = ({ phones, country, loading, headerHeight, ta
       {phones.length ? (
         <Flex
           justify="center"
-          gap={50}
+          gap={10}
           style={{
             padding: 3,
             position: 'sticky',
@@ -70,9 +70,8 @@ const PhonesTab: React.FC<Props> = ({ phones, country, loading, headerHeight, ta
           }}
         >
           <Input
-            size="middle"
             status={queryFailed ? 'error' : ''}
-            style={{ width: '20%' }}
+            style={{ width: '20%', minWidth: '130px' }}
             placeholder="Search"
             allowClear
             addonBefore={<SearchOutlined onPointerEnterCapture={undefined} onPointerLeaveCapture={undefined} />}
@@ -80,13 +79,18 @@ const PhonesTab: React.FC<Props> = ({ phones, country, loading, headerHeight, ta
           />
           <Pagination
             total={uniqBy(phones, 'value').length}
-            showTotal={(total, range) => `${range[0]}-${range[1]} of ${total} phone numbers`}
+            showTotal={(total, range) =>
+              total <= paginationInfo.pageSize
+                ? `${total} phones`
+                : `${range[0]}-${range[1]} of ${total} phones`
+            }
             defaultPageSize={DEFAULT_PAGE_SIZE}
             defaultCurrent={1}
             pageSizeOptions={PAGE_SIZE_OPTIONS}
             {...paginationInfo}
             disabled={loading || !!queryPhones.length || queryFailed}
             onChange={onSetPage}
+            responsive
           />
         </Flex>
       ) : null}

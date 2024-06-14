@@ -1,11 +1,11 @@
 import { Country } from '../providers.js';
 
 export enum Countries {
-  //USA = 'united-states',
+  USA = 'united-states',
   UK = 'united-kingdom',
   Georgia = 'georgia',
   //Ukraine = 'ukraine',
-  Germany = 'germany',
+  //Germany = 'germany',
   Terroruzzia = 'russia'
 }
 

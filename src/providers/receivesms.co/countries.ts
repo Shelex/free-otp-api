@@ -2,16 +2,16 @@ import { Country } from '../providers.js';
 
 export enum Countries {
   Australia = 'australian-phone-numbers/au',
-  France = 'french-phone-numbers/fr',
+  //France = 'french-phone-numbers/fr',
   //Canada = 'canadian-phone-numbers/ca'
   // Germany = 'german-phone-numbers/de',
-  Spain = 'spanish-phone-numbers/es',
-  UK = 'uk-phone-numbers/gb',
+  //Spain = 'spanish-phone-numbers/es',
+  //UK = 'uk-phone-numbers/gb',
   // Georgia = 'georgian-phone-numbers/ge',
   // HongKong = 'hong-kong-phone-numbers/hk',
   // Indonesia = 'indonesian-phone-numbers/id',
   // Israel = 'israeli-phone-numbers/il',
-  Ireland = 'irish-phone-numbers/ie',
+  //Ireland = 'irish-phone-numbers/ie',
   // Kenya = 'kenyan-phone-numbers/ke',
   // Kazakhstan = 'kazakhstani-phone-numbers/kz',
   // Mauritius = 'mauritian-phone-numbers/mu',
