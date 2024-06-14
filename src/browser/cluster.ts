@@ -17,6 +17,12 @@ const createCluster = async () => {
 
   puppeteer.use(stealthPlugin());
 
+  const browserArgs = ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'];
+
+  if (process.env.PROXY) {
+    browserArgs.push(`--proxy-server=${process.env.PROXY}`);
+  }
+
   const cluster = await Cluster.launch({
     concurrency: Cluster.CONCURRENCY_PAGE,
     maxConcurrency: 5, // 5 pages at a time
@@ -29,7 +35,7 @@ const createCluster = async () => {
       handleSIGHUP: true,
       handleSIGTERM: true,
       waitForInitialPage: false,
-      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
+      args: browserArgs
     }
   });
 
