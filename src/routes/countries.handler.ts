@@ -14,7 +14,7 @@ const getAvailableCountries = () =>
             return {
               country: country,
               source: provider.name,
-              url: provider.getCountryUrl(country),
+              url: !!provider?.getCountryUrl ? provider.getCountryUrl(country) : provider.baseUrl,
               count: phones.length ?? 0
             };
           })

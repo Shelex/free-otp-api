@@ -22,7 +22,7 @@ export const savePhones = async (sourceName: string, country: string, phones: Ph
   }
 };
 
-export const getPhones = async (sourceName: string, country: string) => {
+export const getPhones = async (sourceName: string, country: string): Promise<PhoneNumber[]> => {
   try {
     const result = await client.get(getKey(sourceName, country));
     if (!result) {

@@ -8,15 +8,17 @@ export enum Source {
   SmsToMeCom = 'smstome.com',
   ReceiveSmsCo = 'receivesms.co',
   ReceiveSmsOnlineCom = 'receivesmsonline.com',
-  GetFreeSmsNumberCom = 'getfreesmsnumber.com'
+  GetFreeSmsNumberCom = 'getfreesmsnumber.com',
+  ReceiveSmssOnlineCom = 'receive-smss-online.com'
 }
 
 export interface Provider {
+  baseUrl: string;
   name: string;
   getPhonesList: (page: Page, country: Country, url?: string) => Promise<PhoneNumberListReply>;
   handleOtp: (page: Page, options: OtpRouteHandlerOptions) => Promise<Message | Message[] | undefined>;
   countries: Country[];
-  getCountryUrl: (country: Country) => string;
+  getCountryUrl?: (country: Country) => string;
   refreshCacheExpression?: string;
 }
 
