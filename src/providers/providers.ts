@@ -24,14 +24,14 @@ import { countries as quackrIoCountries, Countries as QuackrIoCountries } from '
 import { countries as smsToMeComCountries, Countries as SmsToMeComCountries } from './smstome.com/countries.js';
 import { countries as receiveSmsCoCountries, Countries as ReceiveSmsCoCountries } from './receivesms.co/countries.js';
 import {
-  handleGetFreeSmsNumberCom,
-  getFreeSmsNumberPhones,
-  getCountryUrl as getFreeSmsNumberComCountryUrl
-} from './getfreesmsnumber.com/handler.js';
+  handleReceiveSmsOnlineCom,
+  getReceiveSmsOnlineComPhones,
+  getCountryUrl as getReceiveSmsOnlineCountryUrl
+} from './receiveasmsonline.com/handler.js';
 import {
-  countries as getFreeSmsNumberComCountries,
-  Countries as GetFreeSmsNumberComCountries
-} from './getfreesmsnumber.com/countries.js';
+  countries as receiveSmsOnlineComCountries,
+  Countries as ReceiveSmsOnlineComCountries
+} from './receiveasmsonline.com/countries.js';
 import { handleReceiveSmssOnlineCom, getReceiveSmssOnlineComPhones } from './receive-smss-online.com/handler.js';
 import {
   countries as getReceiveSmssOnlineComCountries,
@@ -44,8 +44,8 @@ export type Country =
   | keyof typeof AnonymSmsCountries
   | keyof typeof QuackrIoCountries
   | keyof typeof SmsToMeComCountries
+  | keyof typeof ReceiveSmsOnlineComCountries
   | keyof typeof ReceiveSmsCoCountries
-  | keyof typeof GetFreeSmsNumberComCountries
   | keyof typeof GetReceiveSmssOnlineComCountries;
 
 export const allowedCountries = Array.from(
@@ -54,8 +54,8 @@ export const allowedCountries = Array.from(
     ...anonymSmsCountries,
     ...quackrIoCountries,
     ...smsToMeComCountries,
+    ...receiveSmsOnlineComCountries,
     ...receiveSmsCoCountries,
-    ...getFreeSmsNumberComCountries,
     ...getReceiveSmssOnlineComCountries
   ])
 );
@@ -106,14 +106,14 @@ export const Sources: Record<Source, Provider> = {
     getCountryUrl: getReceiveSmsCoCountryUrl,
     refreshCacheExpression: '35 */8 * * *'
   },
-  [Source.GetFreeSmsNumberCom]: {
-    name: Source.GetFreeSmsNumberCom,
-    baseUrl: 'https://getfreesmsnumber.com',
-    getPhonesList: getFreeSmsNumberPhones,
-    handleOtp: handleGetFreeSmsNumberCom,
-    countries: getFreeSmsNumberComCountries,
-    getCountryUrl: getFreeSmsNumberComCountryUrl,
-    refreshCacheExpression: '38 */8 * * *'
+  [Source.ReceiveSmsOnlineCom]: {
+    name: Source.ReceiveSmsOnlineCom,
+    baseUrl: 'https://receivesmsonline.com',
+    getPhonesList: getReceiveSmsOnlineComPhones,
+    handleOtp: handleReceiveSmsOnlineCom,
+    countries: receiveSmsOnlineComCountries,
+    getCountryUrl: getReceiveSmsOnlineCountryUrl,
+    refreshCacheExpression: '40 */8 * * *'
   },
   [Source.ReceiveSmssOnlineCom]: {
     name: Source.ReceiveSmssOnlineCom,

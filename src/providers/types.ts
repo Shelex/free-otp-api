@@ -6,8 +6,8 @@ export enum Source {
   AnonymSms = 'anonymsms.com',
   QuackrIo = 'quackr.io',
   SmsToMeCom = 'smstome.com',
+  ReceiveSmsOnlineCom = 'receivesmsonline.com',
   ReceiveSmsCo = 'receivesms.co',
-  GetFreeSmsNumberCom = 'getfreesmsnumber.com',
   ReceiveSmssOnlineCom = 'receive-smss-online.com'
 }
 
