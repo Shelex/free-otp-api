@@ -30,8 +30,6 @@ const parseMessages = async (page: Page) => {
     }))
   );
 
-  consola.info(messageRows);
-
   return messageRows
     .filter((row) => row.ago.length && row.message.length)
     .map((row) => {
@@ -56,7 +54,6 @@ const recursivelyCheckMessages = async (
   await page.waitForNetworkIdle({ idleTime: 1500 });
 
   const parsed = (await parseMessages(page)) || [];
-  consola.info(parsed);
   if (!parsed.length) {
     return [];
   }
@@ -94,8 +91,6 @@ const recursivelyCheckMessages = async (
 
 const getPhoneUrl = async (phone: string, country: Country) => {
   const phones = await getPhones(Source.ReceiveSmssOnlineCom, country);
-  consola.info(`getPhoneUrl(phone=${phone}, country=${country})`);
-  consola.info(JSON.stringify(phones, null, 2));
   return phones.find((p) => p.phone === phone.replace(country === 'USA' ? '+1' : '+', ''))?.url;
 };
 

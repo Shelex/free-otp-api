@@ -73,7 +73,7 @@ const recursivelyCheckMessages = async (
   matcher: string | string[],
   recheckDelay: number
 ): Promise<Message | Message[]> => {
-  await page.waitForNetworkIdle({ idleTime: 1500 });
+  await delay(3);
 
   const parsed = (await parseMessages(page)) || [];
   if (!parsed.length) {
