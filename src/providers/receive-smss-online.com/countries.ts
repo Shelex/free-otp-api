@@ -12,11 +12,11 @@ export enum Countries {
   Mauritius = 'Mauritius',
   India = 'India',
   Croatia = 'Croatia',
-  Mexico = 'Mexico',
+  Portugal = 'Portugal',
   Thailand = 'Thailand',
   Morocco = 'Morocco',
+  Mexico = 'Mexico',
   Bulgaria = 'Bulgaria',
-  Portugal = 'Portugal',
   Brazil = 'Brazil',
   Nigeria = 'Nigeria'
 }

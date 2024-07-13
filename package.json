@@ -19,30 +19,30 @@
     "start": "node dist/src/app.js"
   },
   "dependencies": {
-    "@fastify/cors": "8.4.1",
-    "@fastify/swagger": "8.12.0",
-    "@fastify/swagger-ui": "1.10.1",
+    "@fastify/cors": "9.0.1",
+    "@fastify/swagger": "8.14.0",
+    "@fastify/swagger-ui": "4.0.0",
     "consola": "3.2.3",
-    "croner": "7.0.5",
-    "dotenv": "16.3.1",
-    "fastify": "4.24.3",
+    "croner": "7.0.7",
+    "dotenv": "16.4.5",
+    "fastify": "4.28.1",
     "fastify-healthcheck": "^4.4.0",
-    "json-schema-to-ts": "2.9.2",
+    "json-schema-to-ts": "3.1.0",
     "puppeteer": "19.11.1",
     "puppeteer-cluster": "0.23.0",
     "puppeteer-extra": "3.3.6",
     "puppeteer-extra-plugin-adblocker": "2.13.6",
     "puppeteer-extra-plugin-stealth": "2.11.2",
-    "redis": "4.6.11"
+    "redis": "4.6.15"
   },
   "devDependencies": {
     "@types/node": "18.15.11",
     "@types/redis": "4.0.11",
-    "esbuild": "0.19.8",
-    "eslint": "8.54.0",
-    "eslint-config-prettier": "8.8.0",
+    "esbuild": "0.23.0",
+    "eslint": "8.57.0",
+    "eslint-config-prettier": "8.10.0",
     "eslint-plugin-prettier": "4.2.1",
     "prettier": "2.8.8",
-    "typescript": "5.3.2"
+    "typescript": "5.3.3"
   }
 }

@@ -10,7 +10,7 @@ import { jobs } from './scheduler/cron.js';
 
 dotenv.config();
 
-const app = Fastify();
+const app = Fastify({ logger: true });
 await app.register(cors);
 await app.register(health);
 await app.register(swagger);
@@ -26,6 +26,6 @@ setGracefulShutdown();
 // resume all jobs when app initialized
 Object.values(jobs).map((job) => job.resume());
 
-app.listen({ port: parseInt(process.env.PORT ?? '') || 3030, host: process.env.HOST }, (err) => {
+app.listen({ port: parseInt(process.env.PORT ?? '') || 3030, host: process.env.HOST ?? '0.0.0.0' }, (err) => {
   if (err) throw err;
 });

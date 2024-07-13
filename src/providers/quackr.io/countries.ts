@@ -17,7 +17,7 @@ export enum Countries {
   Hungary = 'hungary',
   India = 'india',
   Indonesia = 'indonesia',
-  Ireland = 'ireland',
+  // Ireland = 'ireland',
   Israel = 'israel',
   //Italy = 'italy',
   SouthKorea = 'korea',

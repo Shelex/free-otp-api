@@ -5,8 +5,10 @@ export enum Countries {
   UK = 'united-kingdom',
   Georgia = 'georgia',
   //Ukraine = 'ukraine',
-  //Germany = 'germany',
-  Terroruzzia = 'russia'
+  Germany = 'germany',
+  Terroruzzia = 'russia',
+  Netherlands = 'netherlands',
+  Spain = 'spain'
 }
 
 export const countries = Object.keys(Countries) as Country[];
