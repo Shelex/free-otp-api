@@ -1,10 +1,6 @@
 import { Country } from '../providers.js';
 
 export enum Countries {
-  USA = 'united-states',
-  UK = 'united-kingdom',
-  Ukraine = 'ukraine',
-  Germany = 'germany',
   Australia = 'australia',
   Austria = 'austria',
   Belgium = 'belgium',
@@ -14,6 +10,7 @@ export enum Countries {
   //Denmark = 'denmark',
   Finland = 'finland',
   France = 'france',
+  Germany = 'germany',
   Hungary = 'hungary',
   India = 'india',
   Indonesia = 'indonesia',
@@ -29,11 +26,14 @@ export enum Countries {
   Pakistan = 'pakistan',
   Poland = 'poland',
   Terroruzzia = 'russia',
-  Thailand = 'thailand',
   SouthAfrica = 'south-africa',
   Spain = 'spain',
   Sweden = 'sweden',
-  Switzerland = 'switzerland'
+  Switzerland = 'switzerland',
+  Thailand = 'thailand',
+  Ukraine = 'ukraine',
+  UK = 'united-kingdom',
+  USA = 'united-states'
 }
 
 export const countries = Object.keys(Countries) as Country[];
