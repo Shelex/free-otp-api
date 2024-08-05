@@ -11,8 +11,8 @@ export enum Countries {
   Spain = 'Spain',
   Ukraine = 'Ukraine',
   Portugal = 'Portugal',
-  Estonia = 'Estonia',
-  Latvia = 'Latvia',
+  //Estonia = 'Estonia',
+  //Latvia = 'Latvia',
   Morocco = 'Morocco'
   //Germany = 'Germany',
   //Poland = 'Poland',
