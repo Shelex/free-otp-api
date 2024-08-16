@@ -49,9 +49,9 @@ const parseNumbersPage = async (url: string, page: Page): Promise<{ numbers: str
   consola.start(`parsing page ${page.url()}`);
 
   const getPhones = async (attempt = 1): Promise<string[]> => {
-    await page.waitForSelector('country-page section', { timeout: 5000 });
-    const availablePhonesLocator = '.columns.is-multiline';
-    const phoneNumberElementsLocator = `${availablePhonesLocator} p.title.is-5-small.mb-1 a`;
+    await page.waitForSelector('app-temporary-numbers-country section', { timeout: 8000 });
+    const availablePhonesLocator = 'app-number-card > div > div:nth-child(2)';
+    const phoneNumberElementsLocator = `${availablePhonesLocator} h5 a`;
     const phones = await page.$$eval(phoneNumberElementsLocator, (elements) =>
       elements.map((el) => el?.textContent?.trim())
     );
@@ -76,39 +76,39 @@ const numberIsOnline = async (page: Page, country: Country, phoneNumber: string)
   const url = getPhoneNumberUrl(country, phoneNumber);
 
   await page.goto(url);
+  await delay(defaultRecheckDelay);
 
-  await page.waitForSelector('messages');
+  await page.waitForSelector('app-messages', { timeout: 8000 });
 
   try {
-    await page.$eval(`messages h2`, (h2) => h2?.textContent?.trim());
-    return false;
-  } catch (e) {
+    await page.$eval(`app-messages section h1 span`, (header) => header?.textContent?.trim());
     return true;
+  } catch (e) {
+    return false;
   }
 };
 
 const parseMessages = async (page: Page) => {
-  const rowLocator = 'table > tbody > tr';
+  const rowLocator = 'app-messages section:nth-child(3) > div > div:nth-child(2) > div:nth-child(1) div.p-4.border-b';
 
   const messageRows =
     (await page.$$eval(rowLocator, (rows) =>
-      rows.map((row) => {
-        const getTdText = (row: HTMLTableRowElement, index: number) => row.children?.item(index)?.textContent ?? '';
-        return [getTdText(row, 0), getTdText(row, 1), getTdText(row, 2)];
-      })
+      rows.map((row) => ({
+        ago: row.querySelector('div > p')?.textContent?.trim() ?? '',
+        from: row.querySelector('div > span')?.textContent?.trim() ?? '',
+        message: row.children.item(1)?.textContent?.trim() ?? ''
+      }))
     )) ?? [];
 
-  const unparsedRows = messageRows.map((row) => row?.filter((x) => x?.trim()));
-
-  return unparsedRows
+  return messageRows
     .map((row) => {
-      const [ago, , message] = row;
+      const { ago, from, message } = row;
       const agoParsed = parseTimeAgo(ago ?? '');
 
       return {
         ago: agoParsed,
         agoText: ago,
-        message,
+        message: `${from}: ${message}`,
         url: page.url()
       } as Message;
     })
@@ -170,7 +170,6 @@ export const handleQuackrIo = async (page: Page, options: OtpRouteHandlerOptions
 
   consola.success(`number ${options.phoneNumber} is online`);
 
-  await delay(1.5);
   const match = await recursivelyCheckMessages(
     page,
     options.askedOtpAt || 0,

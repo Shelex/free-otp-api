@@ -2,7 +2,7 @@ import { Country } from '../providers.js';
 
 export enum Countries {
   Australia = 'australian-phone-numbers/au',
-  France = 'french-phone-numbers/fr',
+  // France = 'french-phone-numbers/fr',
   //Canada = 'canadian-phone-numbers/ca'
   // Germany = 'german-phone-numbers/de',
   //Spain = 'spanish-phone-numbers/es',
