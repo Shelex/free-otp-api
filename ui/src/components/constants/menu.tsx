@@ -42,6 +42,6 @@ export const menuItems = routes
       path: route.path
     },
     label: <NavLink to={route.path}>{route.name}</NavLink>,
-    icon: <route.icon onPointerEnterCapture={undefined} onPointerLeaveCapture={undefined}/>
+    icon: <route.icon onPointerEnterCapture={undefined} onPointerLeaveCapture={undefined} />
   }))
   .concat(externalRoutes);

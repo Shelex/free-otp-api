@@ -3,6 +3,7 @@ import { Country } from '../providers.js';
 export enum Countries {
   USA = 'United States',
   Canada = 'Canada',
+  Lithuania = 'Lithuania',
   UK = 'United Kingdom',
   Denmark = 'Denmark',
   Philippines = 'Philippines',
@@ -13,8 +14,8 @@ export enum Countries {
   Mauritius = 'Mauritius',
   India = 'India',
   Croatia = 'Croatia',
-  Morocco = 'Morocco',
   Serbia = 'Serbia',
+  Morocco = 'Morocco',
   Mexico = 'Mexico',
   Portugal = 'Portugal',
   Thailand = 'Thailand',

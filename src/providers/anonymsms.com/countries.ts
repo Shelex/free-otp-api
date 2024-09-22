@@ -6,7 +6,7 @@ export enum Countries {
   Georgia = 'georgia',
   //Ukraine = 'ukraine',
   Germany = 'germany',
-  Terroruzzia = 'russia',
+  // Terroruzzia = 'russia',
   Netherlands = 'netherlands',
   Spain = 'spain'
 }

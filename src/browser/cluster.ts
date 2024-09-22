@@ -2,7 +2,6 @@ import { Cluster } from 'puppeteer-cluster';
 import vanillaPuppeteer, { Page } from 'puppeteer';
 import { addExtra } from 'puppeteer-extra';
 import stealthPlugin from 'puppeteer-extra-plugin-stealth';
-//import adblockPlugin from 'puppeteer-extra-plugin-adblocker';
 import { consola } from 'consola';
 import { createLock } from './lock.js';
 import { waitFor } from '../time/utils.js';
@@ -11,9 +10,6 @@ const creatingCluster = createLock('creating cluster');
 
 const createCluster = async () => {
   const puppeteer = addExtra(vanillaPuppeteer);
-
-  // ignore @ts-expect-error no types
-  //puppeteer.use(stealthPlugin());.use(adblockPlugin({ blockTrackers: true }));
 
   puppeteer.use(stealthPlugin());
 
