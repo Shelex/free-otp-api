@@ -1,5 +1,5 @@
 import { Cluster } from 'puppeteer-cluster';
-import vanillaPuppeteer, { Page } from 'puppeteer';
+import { Page } from 'puppeteer';
 import { addExtra } from 'puppeteer-extra';
 import stealthPlugin from 'puppeteer-extra-plugin-stealth';
 import { consola } from 'consola';
@@ -9,7 +9,7 @@ import { waitFor } from '../time/utils.js';
 const creatingCluster = createLock('creating cluster');
 
 const createCluster = async () => {
-  const puppeteer = addExtra(vanillaPuppeteer);
+  const puppeteer = addExtra(require('puppeteer'));
 
   puppeteer.use(stealthPlugin());
 
@@ -26,7 +26,7 @@ const createCluster = async () => {
     puppeteer,
     sameDomainDelay: 1000,
     puppeteerOptions: {
-      headless: 'new',
+      headless: 'shell',
       handleSIGINT: true,
       handleSIGHUP: true,
       handleSIGTERM: true,

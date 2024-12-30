@@ -1,4 +1,4 @@
-FROM ghcr.io/puppeteer/puppeteer:19.11.1
+FROM ghcr.io/puppeteer/puppeteer:23.10.4
 
 USER node
 
