@@ -6,7 +6,7 @@ export enum Countries {
   //Canada = 'canadian-phone-numbers/ca'
   // Germany = 'german-phone-numbers/de',
   //Spain = 'spanish-phone-numbers/es',
-  //UK = 'uk-phone-numbers/gb',
+  UK = 'uk-phone-numbers/gb',
   // Georgia = 'georgian-phone-numbers/ge',
   // HongKong = 'hong-kong-phone-numbers/hk',
   // Indonesia = 'indonesian-phone-numbers/id',
