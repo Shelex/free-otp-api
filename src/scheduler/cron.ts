@@ -24,7 +24,7 @@ const lookupPhoneNumbers = async (provider: Provider) => {
 };
 
 export const createJob = (provider: Provider, scheduleExpression: string) =>
-  Cron(scheduleExpression, { catch: true, unref: true, paused: true }, async () => {
+  new Cron(scheduleExpression, { catch: true, unref: true, paused: true }, async () => {
     consola.success(`starting job`);
     await lookupPhoneNumbers(provider);
   });

@@ -14,7 +14,7 @@ const getAvailableCountries = () =>
             return {
               country: country,
               source: provider.name,
-              url: !!provider?.getCountryUrl ? provider.getCountryUrl(country) : provider.baseUrl,
+              url: provider?.getCountryUrl ? provider.getCountryUrl(country) : provider.baseUrl,
               count: phones.length ?? 0
             };
           })
@@ -28,9 +28,9 @@ export const listCountriesHandler: RouteHandler<{
   try {
     const providerRecords = await getAvailableCountries();
     const countries = providerRecords.flat();
-    reply.send(countries);
+    return reply.send(countries);
   } catch (error) {
     consola.warn(error);
-    reply.code(400).send({ error: (error as Error)?.message });
+    return reply.code(400).send({ error: (error as Error)?.message });
   }
 };
