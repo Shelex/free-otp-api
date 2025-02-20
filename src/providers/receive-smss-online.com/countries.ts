@@ -9,7 +9,7 @@ export enum Countries {
   // Philippines = 'Philippines',
   // HongKong = 'Hong Kong',
   Spain = 'Spain',
-  Ukraine = 'Ukraine',
+  // Ukraine = 'Ukraine',
   Israel = 'Israel',
   Mauritius = 'Mauritius',
   India = 'India',
@@ -18,7 +18,7 @@ export enum Countries {
   // Morocco = 'Morocco',
   Mexico = 'Mexico',
   Portugal = 'Portugal',
-  Thailand = 'Thailand',
+  // Thailand = 'Thailand',
   //Bulgaria = 'Bulgaria',
   Brazil = 'Brazil',
   Nigeria = 'Nigeria'
