@@ -2,7 +2,7 @@ import fp from 'fastify-plugin';
 import { type FastifyPluginAsync } from 'fastify';
 import fastifySwagger, { type FastifyDynamicSwaggerOptions } from '@fastify/swagger';
 import fastifySwaggerUi, { type FastifySwaggerUiOptions } from '@fastify/swagger-ui';
-import packageJSON from '../../package.json' with { type: 'json' };
+import packageJSON from '../../package.json' assert { type: 'json' };
 
 const docsPlugin: FastifyPluginAsync = async (app) => {
   const openApiOptions: FastifyDynamicSwaggerOptions = {
