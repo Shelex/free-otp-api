@@ -31,6 +31,7 @@ export enum Countries {
   SouthAfrica = 'south-africa',
   Serbia = 'serbia',
   Spain = 'spain',
+  Slovenia = 'slovenia',
   Sweden = 'sweden',
   Switzerland = 'switzerland',
   Thailand = 'thailand',
