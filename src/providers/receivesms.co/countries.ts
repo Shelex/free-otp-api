@@ -15,7 +15,7 @@ export enum Countries {
   Spain = 'spanish-phone-numbers/ES/',
   Finland = 'finnish-phone-numbers/FI/',
   France = 'french-phone-numbers/FR/',
-  UnitedKingdom = 'uk-phone-numbers/GB/',
+  UK = 'uk-phone-numbers/GB/',
   Greece = 'greek-phone-numbers/GR/',
   Croatia = 'croatian-phone-numbers/HR/',
   Hungary = 'hungarian-phone-numbers/HU/',
